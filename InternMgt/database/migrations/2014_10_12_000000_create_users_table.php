@@ -25,10 +25,10 @@ return new class extends Migration
 
 	    $table->string('Role',3);
 
-	    //$table->bigInteger('Supervisor')->nullable();
-	    $table->foreignUlid('Supervisor')->references('user_id')->on('users')->nullable();
+	    $table->string('Supervisor')->nullable();
+	    $table->foreign('Supervisor')->references('user_id')->on('users');
 
-	    $table->boolean('Status',false);
+	    $table->boolean('Status');
             
 	    $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();

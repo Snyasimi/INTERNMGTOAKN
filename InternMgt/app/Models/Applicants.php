@@ -17,4 +17,5 @@ class Applicants extends Model
         'Rating'
 
     ];
+    protected $table="applicants";
 }
