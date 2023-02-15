@@ -26,6 +26,7 @@
             </label><br>
             <label for="Supervisor">Supervisor
                <select name="Supervisor">
+                    <option value=""></option>
                 @foreach($Supervisors as $Supervisor)
                     <option value="{{$Supervisor->user_id}}">{{$Supervisor->Name}}</option>
                 @endforeach
@@ -41,6 +42,10 @@
                 
                 <button type="reset">Clear</button>
             </p>
+
+            @foreach($roles as $role)
+            <p>{{$role}}</p>
+            @endforeach
         </form>
     </body>
 </html>

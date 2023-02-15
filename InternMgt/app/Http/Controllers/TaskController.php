@@ -15,7 +15,12 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        //Get the tasks assigned to the authenticated user
+        $user = User::where('user_id','01gs593xf14wxkn035a50bffe3')->first();//Auth::user();
+        $tasks = Task::where('AssignedTo',$user->user_id)->first();
+        return response()->json([
+            'tasks' => $tasks
+        ]);
     }
 
     /**
@@ -59,7 +64,9 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
+        return response()->json([
+            'task' => $task
+        ],200);
     }
 
     /**

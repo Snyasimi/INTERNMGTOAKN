@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\{UsersController,TaskController,ApplicantsController,DepartmentController};
+use App\Http\Controllers\{LoginController,UsersController,TaskController,ApplicantsController,DepartmentController};
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,3 +22,9 @@ Route::resource('/Apply',ApplicantsController::class);
 Route::resource('Dept',DepartmentController::class);
 Route::resource('User',UsersController::class);
 Route::resource('Task',TaskController::class);
+
+
+Route::get('Login',[LoginController::class,'Login'])->name("Login");
+Route::post('Login',[LoginController::class,'authenticate'])->name('AuthLogin');
+Route::get('Login/Sign',[LoginController::class,'register'])->name('SignUp');
+Route::get('supervisors',[UsersController::class,'myInterns'])->name('sup');

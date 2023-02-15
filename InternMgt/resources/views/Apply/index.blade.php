@@ -15,6 +15,15 @@
                 @csrf
                 <input type="submit" value="Delete">
                 </form></p>
+
+                <p><form action="{{route('Apply.update',$applicant->id)}}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <input type="submit" value="Accept" />
+                </form>
+            </p>
+
+
         @endforeach
     </body>
 </html>

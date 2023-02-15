@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\AcceptedIntern;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Department;
 use App\Models\User;
@@ -15,8 +16,13 @@ class UsersController extends Controller
      */
     public function index()
     {
-        //
+        //Display innterns
+        $user = User::whereNotNull('Supervisor')->get();
+        
+        
+        return response()->json([$user],200);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -27,7 +33,8 @@ class UsersController extends Controller
     {
         $depts = Department::all();
         $Supervisors = User::whereNull('Supervisor')->get();
-        return view('User.create',['depts'=>$depts,'Supervisors'=>$Supervisors]);
+        $roles = ['Admin','Supervisor','Intern'];
+        return view('User.create',['roles'=>$roles,'depts'=>$depts,'Supervisors'=>$Supervisors]);
     }
 
     /**
@@ -49,6 +56,10 @@ class UsersController extends Controller
         $user->Status = true;
         $user->password = Hash::make($request->input('password'));
         $user->save();
+
+        return response()->json([
+            "message" => "Successfully created"
+        ]);
     }
 
     /**
@@ -59,7 +70,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return response($user);
     }
 
     /**
@@ -82,7 +93,10 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+       return response()->json([
+        'message'=>'Updated', 
+        'user' =>$user
+       ]);
     }
 
     /**
@@ -93,6 +107,24 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        return response()->json([
+            "message" => 'Deleted',
+            'user' => $user
+        ]);
+    }
+
+    public function myInterns(Request $request){
+
+        if($request->has(['supervisor'])){
+        $user = User::findorfail($request->input('supervisor'));
+        $Interns = $user->Attachee();
+        }
+
+        else{
+            $Supervisors = User::where('Supervisor','01gs7sfpbyvqk9t4hpaxjgjqjf')->get();
+
+            return view('User.index',['supervisors' =>$Supervisors]);
+        }
+
     }
 }

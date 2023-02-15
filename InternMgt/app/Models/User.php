@@ -47,12 +47,16 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'id'
+        'PhoneNumber',
+        'email_verified_at',
+        'Email',
+        'Role'
+        
     ];
 
     public function Attachee(){
 
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class,'user_id');
     }
 
     public function Supervisor(){

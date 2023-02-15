@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Applicants;
 use Illuminate\Http\Request;
 
+
 class ApplicantsController extends Controller
 {
     /**
@@ -50,8 +51,8 @@ class ApplicantsController extends Controller
         
 	   
 
-	    $url_to_file= $request->file('Cv')->store('public/cv');
-
+	     $url_to_file = $request->file('CV-letter')->store('app/storage');
+        //$path = $url_to_file;
 	   
             
 	   $applicant = Applicants::create([
@@ -60,9 +61,9 @@ class ApplicantsController extends Controller
 		'PhoneNumber' => $request->input('PhoneNumber'),
 		'Position' => $request->input('Position'),
 		'url_to_file' => $url_to_file,
-        	'Rating'=> 0
+        'Rating'=> 0
 	   ]);
-
+        //dd($applicant);
 	    return redirect(route('Apply.index'));
 
 
@@ -99,9 +100,12 @@ class ApplicantsController extends Controller
      * @param  \App\Models\Applicants  $applicants
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Applicants $applicants)
+    public function update(Request $request,$id)
     {
-        //
+        $Applicant = Applicants::findorfail($id); 
+        
+        //dd($Applicant->Email);
+        return to_route('Apply.create');
     }
 
     /**
@@ -114,7 +118,7 @@ class ApplicantsController extends Controller
     {
 	    $applicant = Applicants::findorfail($id);
 	    $applicant->delete();
-	    return redirect()->back();
+	    return redirect(roure("Apply.index"));//->back();
 
     }
 }
