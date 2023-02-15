@@ -14,7 +14,12 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        //
+        $Departments = Department::all();
+         $data = [
+            "Departments" => $Departments,
+            'message' => 'All departments'
+         ];
+        return response()->json($data, 200);
     }
 
     /**
@@ -38,7 +43,13 @@ class DepartmentController extends Controller
         $dept = new Department;
         $dept->DepartmentName = $request->input('DeptName');
         $dept->save();
-        return redirect("/");
+
+         //JSON DATA TO BE RETURNED
+        $data = [
+            'message' => 'Department created'
+        ];
+
+        return response()->json($data, 200);;
     }
 
     /**
@@ -49,7 +60,11 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
-        //
+        $data = [
+            'Department' => $department
+        ];
+
+        return response()->json($data, 201);
     }
 
     /**

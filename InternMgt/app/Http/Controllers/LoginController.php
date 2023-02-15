@@ -24,6 +24,13 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             //dd($credentials);
             //$request->session()->regenerate();
+            if(Auth::user()->Role == "Adm"){
+                $token = Auth::user()->createToken('Login-Token',['can:doanything'])->plainTextToken;
+            }
+            elseif(Auth::user()->Role == 'Sup'){
+                $token = Auth::user()->createToken('Login-Token',['can:assignroles'])->plainTextToken;
+            }
+
             $token = Auth::user()->createToken('Login-Token')->plainTextToken;
             $response = [
                 'user' => Auth::user(),
@@ -43,7 +50,7 @@ class LoginController extends Controller
 
             Auth::user()->currentAccessToken()->delete();
             session()->invalidate();
-            Auth::logout();
+            //Auth::logout();
 
             return response()->json([
                 'message'=>"Logged Out"

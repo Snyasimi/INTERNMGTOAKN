@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -16,7 +17,7 @@ class TaskController extends Controller
     public function index()
     {
         //Get the tasks assigned to the authenticated user
-        $user = User::where('user_id','01gs593xf14wxkn035a50bffe3')->first();//Auth::user();
+        $user =Auth::user(); //User::where('user_id','01gs593xf14wxkn035a50bffe3')->first();Auth::user();
         $tasks = Task::where('AssignedTo',$user->user_id)->first();
         return response()->json([
             'tasks' => $tasks
@@ -31,7 +32,8 @@ class TaskController extends Controller
     public function create()
     {
         $Interns = User::whereNotNull('Supervisor')->get();
-        return view('Task.create',['Interns'=> $Interns]);
+
+        return response()->json(['Interns' => $Interns],200);
     }
 
     /**
@@ -45,7 +47,7 @@ class TaskController extends Controller
     public function store(Request $request)
     {
 	    //Authenticated user obviously an admin tho check the roles
-            $Supervisor = User::findorfail('01gs56v8d1jhnkgh0dpbcdcty0');
+        $Supervisor = User::findorfail('01gs56v8d1jhnkgh0dpbcdcty0');
 	    $Task = new Task;
 	    $Task->AssignedTo = $request->input('AssignedTo');
 	    $Task->Task = $request->input('Task');
@@ -53,6 +55,10 @@ class TaskController extends Controller
 	    $Task->Status = false;
 	    $Supervisor->Assign()->save($Task);
 	    
+        $data = [
+            "message" => 'Task assigned'
+        ];
+        return response()->json($data, 201);
 
     }
 
@@ -78,6 +84,10 @@ class TaskController extends Controller
     public function edit(Task $task)
     {
         //RETURN ONLY THE BODY AND THE ASSIGNED TO
+        $data = ['task' => $task,
+        'message' => 'view task'
+    ];
+        return response()->json($data, 200);
     }
 
     /**
@@ -95,10 +105,20 @@ class TaskController extends Controller
         if($request->has('Status')){
              $task->Status = $request->input('Status');
             $task->save();
+            $data = [
+                'message' => 'Updated successfuly'
+            ];
+            return response()->json($data, 200);
         }else{
+
             $task->AssignedTo = $request->input('AssignedTo');
             $task->Task = $request->input("Task");
             $task->save();
+            $data = [
+                'message' => 'Task Assigned'
+            ];
+            return response()->json($data, 200);
+
         }
 
     }

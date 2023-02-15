@@ -16,8 +16,12 @@ class ApplicantsController extends Controller
     public function index()
     {
         $Applicants = Applicants::all();
-
-	return view('Apply.index',['applicants'=>$Applicants]);
+        
+         $data =[
+            "Applicants" => $Applicants,
+            "message" => 'Displaying applicants'
+         ];
+	return response()->json($data, 200);
     }
 
     /**
