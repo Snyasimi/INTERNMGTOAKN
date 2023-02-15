@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
@@ -58,13 +59,21 @@ class DepartmentController extends Controller
      * @param  \App\Models\Department  $department
      * @return \Illuminate\Http\Response
      */
-    public function show(Department $department)
+    public function show($id)
     {
-        $data = [
-            'Department' => $department
-        ];
+        try{
 
-        return response()->json($data, 201);
+            $department = Department::findorfail($id);
+            $data = [
+                'Department' => $department
+            ];
+
+            return response()->json($data, 200);
+        }
+        catch(ModelNotFoundException){
+
+            return response()->json(['message' => 'Department Not found'],404);
+        }
     }
 
     /**
@@ -73,9 +82,21 @@ class DepartmentController extends Controller
      * @param  \App\Models\Department  $department
      * @return \Illuminate\Http\Response
      */
-    public function edit(Department $department)
+    public function edit($id)
     {
-        //
+        try{
+            $department = Department::findorfail($id);
+            $data = [
+                 'Department' => $department,
+                 'message' => 'displaying depatment'
+            ];
+ 
+            return response()->json($data,200);
+         }
+ 
+         catch(ModelNotFoundException){
+             return response()->json(['message' => 'department not found'],404);
+         }
     }
 
     /**
@@ -96,8 +117,16 @@ class DepartmentController extends Controller
      * @param  \App\Models\Department  $department
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Department $department)
+    public function destroy($id)
     {
-        //
+        try{
+            $department = Department::findorfail($id);
+            $department->delete();
+            return response()->json(['message'=>'Department deleted'],410);
+            }
+            catch(ModelNotFoundException){
+                return response()->json(['message' => 'Department not found'],404);
+            }
+    
     }
 }

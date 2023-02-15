@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Position;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Applicants;
@@ -33,7 +34,12 @@ class ApplicantsController extends Controller
      */
     public function create()
     {
-        //return view('Apply.create');
+        $positions = Position::all();
+        //return view('Apply.create',['position' => $positions]);
+        $data =[
+            'positions' => $positions
+        ];
+        return response()->json($data,200);
     }
 
     /**
@@ -47,17 +53,17 @@ class ApplicantsController extends Controller
         //dd($request->all());
 	     $validate = $request->validate([
 	    	'Name' => ['required'],
-		    'Email' => ['required','unique:email,users'],
+		    'Email' => ['required','unique:applicants,users'],
 		    'PhoneNumber' =>['min_digits:8'],
-		    'Position' => ['required',],
+		    'Position' => ['required'],
 		    'Cv'=>['file']
 	
 	    ]);
 
         
 	   
-
-	     $url_to_file = $request->file('CV-letter')->store('cv');
+        //dd($request->all());
+	     $url_to_file = $request->file('Cv')->store('cv');
         //$path = $url_to_file;
 	   
             
@@ -157,7 +163,7 @@ class ApplicantsController extends Controller
             $data =[
                 "message" => $applicant->Name . " " . "deleted"
             ];
-	        return response()->json($data,200);
+	        return response()->json($data,410);
         }
 
         catch(ModelNotFoundException){

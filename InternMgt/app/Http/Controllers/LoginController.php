@@ -24,7 +24,7 @@ class LoginController extends Controller
             //     $token = Auth::user()->createToken('Login-Token',['can:assignroles'])->plainTextToken;
             // }
 
-            $request->session()->regenerate();
+            //$request->session()->regenerate();
             $token = Auth::user()->createToken('Login-Token')->plainTextToken;
             $response = [
                 'user' => Auth::user(),
@@ -35,7 +35,7 @@ class LoginController extends Controller
         }
         else{
 
-            return response(["message"=>'Credentials do not match our records']);
+            return response(["message"=>'Credentials do not match our records'],401);
         }
 
 

@@ -1,7 +1,16 @@
 <?php
-use App\Http\Controllers\{TaskController,LoginController,UsersController};
+use App\Http\Controllers\{TaskController,
+	LoginController,
+	UsersController,
+	DepartmentController,
+	ApplicantsController,
+	CommentController,
+	RolesController,
+	PositionController	
+};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,12 +24,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/',[UsersController::class,'index']);
-Route::resource('login',LoginController::class);
-Route::get('login',[LoginController::class,'login'])->name('login');
+//Route::resource('login',LoginController::class);
+Route::post('login',[LoginController::class,'login'])->name('login');
 
 Route::middleware(['auth:sanctum'])->group(function(){
 	Route::post('logout',[LoginController::class,'logout']);
 	Route::resource('Task',TaskController::class);
-	Route::resource('user',Userscontroller::class);
+	Route::resource('User',Userscontroller::class);
+	Route::resource('Department',DepartmentController::class);
+	Route::resource('Apply',ApplicantsController::class);
+	Route::post('Comment',[CommentController::class,'store']);
+	Route::resource('Roles',RolesController::class);
+	Route::resource('Position',PositionController::class);
 	}
 );

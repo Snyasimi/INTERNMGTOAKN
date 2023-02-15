@@ -16,22 +16,44 @@
             <label for="PhoneNumber">PhoneNumber
                 <input type="number" required name="PhoneNumber" />
             </label><br>
-            <label for="Department">Department
-                @foreach($depts as $dept)
-                {{$dept->DepartmentName}}<input type ="radio" value="{{$dept->id}}" name="Department">
+
+            <label for="Role">Department
+                <select name="Department">
+                    <option value=""></option>
+                @foreach($depts as $d)
+                    <option value="{{$d->id}}">{{$d->DepartmentName}}</option>
                 @endforeach
+                </select>
             </label><br>
+
+            <label for="Role">Position
+                <select name="Position">
+                    <option value=""></option>
+                @foreach($position as $p)
+                    <option value="{{$p->id}}">{{$p->Position}}</option>
+                @endforeach
+                </select>
+            </label><br>
+
+
             <label for="Role">Role
-                <input type="text" name="Role" required />
+                <select name="Role">
+                    <option value=""></option>
+                @foreach($roles as $role)
+                    <option value="{{$role->id}}">{{$role->Role}}</option>
+                @endforeach
+                </select>
             </label><br>
+
             <label for="Supervisor">Supervisor
                <select name="Supervisor">
                     <option value=""></option>
                 @foreach($Supervisors as $Supervisor)
-                    <option value="{{$Supervisor->user_id}}">{{$Supervisor->Name}}</option>
+                    <option value="{{$Supervisor->id}}">{{$Supervisor->Name}}</option>
                 @endforeach
 
             </label>
+
             <label for="Password">Password 
                 <input type="password" name="password" required>
             </label>
@@ -43,9 +65,9 @@
                 <button type="reset">Clear</button>
             </p>
 
-            @foreach($roles as $role)
+            {{-- @foreach($roles as $role)
             <p>{{$role}}</p>
-            @endforeach
+            @endforeach --}}
         </form>
     </body>
 </html>

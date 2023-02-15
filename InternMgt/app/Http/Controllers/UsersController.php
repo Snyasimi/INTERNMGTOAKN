@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 use App\Events\AcceptedIntern;
+use App\Models\Position;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Department;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -18,16 +21,14 @@ class UsersController extends Controller
     public function index()
     {
         //Display innterns
-        if(Auth::user()->can('view')){
-        $user = User::whereNotNull('Supervisor')->get();
+        
+        $user = User::all();
         
         
         return response()->json([$user],200);
         }
-        else{
-            return response()->json("cannot",404);
-        }
-    }
+
+    
 
 
     /**
@@ -38,9 +39,19 @@ class UsersController extends Controller
     public function create()
     {
         $depts = Department::all();
-        $Supervisors = User::whereNull('Supervisor')->get();
-        $roles = ['Admin','Supervisor','Intern'];
-        return view('User.create',['roles'=>$roles,'depts'=>$depts,'Supervisors'=>$Supervisors]);
+        $Supervisors = User::where('Role',2)->get();
+        $roles = Role::all();
+        $positions = Position::all();
+        
+        $data = [
+            'Departments' => $depts,
+            'Supervisors' => $Supervisors,
+            'Roles' => $roles,
+            'Positions' => $positions
+        ];
+
+        return response()->json($data,200);
+        
     }
 
     /**
@@ -56,8 +67,10 @@ class UsersController extends Controller
         $user->Name = $request->input('Name');
         $user->Email = $request->input('Email');
         $user->PhoneNumber = $request->input('PhoneNumber');
-        $user->department_id = $request->input('Department');
-        $user->Role = $request->input('Role');
+	    $user->department_id = $request->input('Department');
+	    $user->Position = $request->input('Position');
+	    $user->Role = $request->input('Role');
+
         $user->Supervisor = $request->input('Supervisor');
         $user->Status = true;
         $user->password = Hash::make($request->input('password'));
@@ -65,7 +78,7 @@ class UsersController extends Controller
 
         return response()->json([
             "message" => "Successfully created"
-        ]);
+        ],201);
     }
 
     /**
@@ -74,9 +87,23 @@ class UsersController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show($id)
     {
-        return response($user);
+        try{
+            $user = User::findorfail($id);
+            $data = [
+                'User' => $user
+            ];
+
+            return response()->json($data,200);
+        }
+        catch(ModelNotFoundException){
+             return response()->json([
+                'message' => 'No such user'
+             ],404);
+        }
+
+        
     }
 
     /**
@@ -85,9 +112,21 @@ class UsersController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $user)
+    public function edit($id)
     {
-        //
+        try{
+            $user = User::findorfail($id);
+            $data = [
+                'User' => $user
+            ];
+
+            return response()->json($data,200);
+        }
+        catch(ModelNotFoundException){
+             return response()->json([
+                'message' => 'No such user'
+             ],404);
+        }
     }
 
     /**
@@ -111,12 +150,19 @@ class UsersController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        return response()->json([
-            "message" => 'Deleted',
-            'user' => $user
-        ]);
+        try{
+            $user = User::findorfail($id);
+            $user->delete();
+
+            return response()->json(['message' => 'User deleted'],410);
+        }
+        catch(ModelNotFoundException){
+             return response()->json([
+                'message' => 'No such user'
+             ],404);
+        }
     }
 
     public function myInterns(Request $request){

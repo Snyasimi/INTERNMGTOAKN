@@ -16,9 +16,16 @@
             <label for="PhoneNumber">PhoneNumber
                 <input type="number" required name="PhoneNumber" />
             </label><br>
-            <label for="Position">Position
-                <input type="text" name="Position" required />
+            
+            <label for="Role">Position
+                <select name="Position">
+                    <option value=""></option>
+                @foreach($position as $p)
+                    <option value="{{$p->id}}">{{$p->Position}}</option>
+                @endforeach
+                </select>
             </label><br>
+
             <label for="Cv">Your CV
                 <input type="file" name="Cv" required />
             </label><br>

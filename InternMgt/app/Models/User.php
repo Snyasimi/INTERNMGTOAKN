@@ -54,6 +54,17 @@ class User extends Authenticatable
         
     ];
 
+
+    //RELATIONSHIPS
+
+    public function MyRole(){
+        return $this->belongsTo(Role::class);
+    }
+    
+    public function MyPosition(){
+
+        return $this->belongsTo(Position::class);
+    }
     public function Attachee(){
 
         return $this->hasMany(User::class,'user_id');
