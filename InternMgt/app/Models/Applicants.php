@@ -17,5 +17,7 @@ class Applicants extends Model
         'Rating'
 
     ];
+
+    //protected $hidden = ['Email','PhoneNumber'];
     protected $table="applicants";
 }

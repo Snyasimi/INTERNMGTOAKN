@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Applicants;
 use Illuminate\Http\Request;
@@ -15,8 +16,9 @@ class ApplicantsController extends Controller
      */
     public function index()
     {
+        //SHOW ALL APPLICANTS
         $Applicants = Applicants::all();
-        
+
          $data =[
             "Applicants" => $Applicants,
             "message" => 'Displaying applicants'
@@ -45,17 +47,17 @@ class ApplicantsController extends Controller
         //dd($request->all());
 	     $validate = $request->validate([
 	    	'Name' => ['required'],
-		'Email' => ['required','unique:users','email'],
-		'PhoneNumber' =>['min_digits:8'],
-		'Position' => ['required',],
-		'Cv'=>['file']
+		    'Email' => ['required','unique:email,users'],
+		    'PhoneNumber' =>['min_digits:8'],
+		    'Position' => ['required',],
+		    'Cv'=>['file']
 	
 	    ]);
 
         
 	   
 
-	     $url_to_file = $request->file('CV-letter')->store('app/storage');
+	     $url_to_file = $request->file('CV-letter')->store('cv');
         //$path = $url_to_file;
 	   
             
@@ -68,7 +70,7 @@ class ApplicantsController extends Controller
         'Rating'=> 0
 	   ]);
         //dd($applicant);
-	    return redirect(route('Apply.index'));
+	    return response()->json(["message" => "Created"], 201);
 
 
     }
@@ -81,9 +83,25 @@ class ApplicantsController extends Controller
      */
     public function show($id)
     {
-	    $applicant = Applicants::findorfail($id);
-	    $cv = Storage::url($applicant->url_to_file);
-	    return response()->view('Apply.show',['applicant'=>$applicant,'cv'=>$cv]);
+        try{
+       
+	        $applicant = Applicants::findorfail($id);
+	        $cv = Storage::url($applicant->url_to_file);
+            $data = [
+                'Applicant' => $applicant,
+          
+                'message' => 'Showing applicant'
+            ];
+	        return response()->json($data,200);
+        }
+        catch(ModelNotFoundException){
+            $data = [
+                'message' => 'Model not found'
+            ];
+        
+            return response()->json($data, 404);
+
+        };
     }
 
     /**
@@ -106,10 +124,22 @@ class ApplicantsController extends Controller
      */
     public function update(Request $request,$id)
     {
-        $Applicant = Applicants::findorfail($id); 
+        try{
+            $Applicant = Applicants::findorfail($id); 
+            $data = [
+                'message' => 'Updated successfuly'
+            ];
         
-        //dd($Applicant->Email);
-        return to_route('Apply.create');
+            return response()->json($data, 200);
+        }
+        catch(ModelNotFoundException){
+            $data = [
+                'message' => 'Model not found'
+            ];
+        
+            return response()->json($data, 404);
+
+        };
     }
 
     /**
@@ -120,9 +150,21 @@ class ApplicantsController extends Controller
      */
     public function destroy($id)
     {
-	    $applicant = Applicants::findorfail($id);
-	    $applicant->delete();
-	    return redirect(roure("Apply.index"));//->back();
+        try{
 
+	        $applicant = Applicants::findorfail($id);
+	        $applicant->delete();
+            $data =[
+                "message" => $applicant->Name . " " . "deleted"
+            ];
+	        return response()->json($data,200);
+        }
+
+        catch(ModelNotFoundException){
+            $data = [
+                'message' => 'Not Found in database'
+            ];
+            return response()->json($data, 404);
+        }
     }
 }

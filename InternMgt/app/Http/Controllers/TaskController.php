@@ -17,12 +17,27 @@ class TaskController extends Controller
     public function index()
     {
         //Get the tasks assigned to the authenticated user
-        $user =Auth::user(); //User::where('user_id','01gs593xf14wxkn035a50bffe3')->first();Auth::user();
-        $tasks = Task::where('AssignedTo',$user->user_id)->first();
-        return response()->json([
-            'tasks' => $tasks
-        ]);
-    }
+        $user =Auth::user();
+        if($user->Role == "Sup"){
+            //User::where('user_id','01gs593xf14wxkn035a50bffe3')->first();Auth::user();
+            $tasks = Task::where('AssignedBy',$user->user_id)->get();
+             $data = [
+                'Tasks' => $tasks
+             ];
+            return response()->json($data,200);
+
+            }
+            else{
+                   //User::where('user_id','01gs593xf14wxkn035a50bffe3')->first();Auth::user();
+                    $tasks = Task::where('AssignedBy',$user->user_id)->get();
+                     $data = [
+                        'Tasks' => $tasks
+                     ];
+                    return response()->json($data,200);
+                    
+               }
+     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -32,8 +47,11 @@ class TaskController extends Controller
     public function create()
     {
         $Interns = User::whereNotNull('Supervisor')->get();
-
-        return response()->json(['Interns' => $Interns],200);
+        $data = [
+            "Interns" => $Interns,
+            "message" => "Dispalying interns"
+        ];
+        return response()->json($data,200);
     }
 
     /**
@@ -47,11 +65,13 @@ class TaskController extends Controller
     public function store(Request $request)
     {
 	    //Authenticated user obviously an admin tho check the roles
-        $Supervisor = User::findorfail('01gs56v8d1jhnkgh0dpbcdcty0');
+        //$Supervisor = User::findorfail('01gs56v8d1jhnkgh0dpbcdcty0');
+        $Supervisor = Auth::user();
 	    $Task = new Task;
 	    $Task->AssignedTo = $request->input('AssignedTo');
 	    $Task->Task = $request->input('Task');
 	    $Task->Deadline = $request->date('Deadline');
+        //ADD DESCRIPTION
 	    $Task->Status = false;
 	    $Supervisor->Assign()->save($Task);
 	    
@@ -68,11 +88,13 @@ class TaskController extends Controller
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function show(Task $task)
+    public function show($id)
     {
-        return response()->json([
+        $task= Task::findOrfail($id);
+        $data = [
             'task' => $task
-        ],200);
+        ];
+        return response()->json($data,200);
     }
 
     /**
@@ -81,10 +103,10 @@ class TaskController extends Controller
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function edit(Task $task)
+    public function edit($id)
     {
         //RETURN ONLY THE BODY AND THE ASSIGNED TO
-        $data = ['task' => $task,
+        $data = ['task' => Task::findorfail($id),
         'message' => 'view task'
     ];
         return response()->json($data, 200);
@@ -97,31 +119,22 @@ class TaskController extends Controller
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Task $task)
+    public function update(Request $request, $id)
     {
-        $task = Task::findorfail($task);
+        $task = Task::findorfail($id);
         //When the request came from a supervisor it doesnt have the status field 
         //it is assumed to come from intern so the only thing being updated is the status 
-        if($request->has('Status')){
-             $task->Status = $request->input('Status');
+            $task->Task = $request->input('Task');
+            $task->Deadline = $request->input('Deadline');
             $task->save();
             $data = [
-                'message' => 'Updated successfuly'
-            ];
-            return response()->json($data, 200);
-        }else{
-
-            $task->AssignedTo = $request->input('AssignedTo');
-            $task->Task = $request->input("Task");
-            $task->save();
-            $data = [
-                'message' => 'Task Assigned'
+                'message' => 'Task Changed'
             ];
             return response()->json($data, 200);
 
         }
 
-    }
+    
 
     /**
      * Remove the specified resource from storage.

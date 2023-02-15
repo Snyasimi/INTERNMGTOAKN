@@ -46,10 +46,10 @@ class DepartmentController extends Controller
 
          //JSON DATA TO BE RETURNED
         $data = [
-            'message' => 'Department created'
+            'message' => 'Department ::'." ".$dept->DepartmentName." ". 'created'
         ];
 
-        return response()->json($data, 200);;
+        return response()->json($data, 201);;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Events\AcceptedIntern;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Department;
 use App\Models\User;
@@ -17,10 +18,15 @@ class UsersController extends Controller
     public function index()
     {
         //Display innterns
+        if(Auth::user()->can('view')){
         $user = User::whereNotNull('Supervisor')->get();
         
         
         return response()->json([$user],200);
+        }
+        else{
+            return response()->json("cannot",404);
+        }
     }
 
 

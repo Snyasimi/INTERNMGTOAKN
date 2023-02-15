@@ -7,13 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    public function register(){
-
-        return view('User.create');
-    }
-
-  
-    public function login(Request $request)
+     public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
@@ -22,18 +16,19 @@ class LoginController extends Controller
         //dd($credentials);
  
         if (Auth::attempt($credentials)) {
-            //dd($credentials);
-            //$request->session()->regenerate();
-            if(Auth::user()->Role == "Adm"){
-                $token = Auth::user()->createToken('Login-Token',['can:doanything'])->plainTextToken;
-            }
-            elseif(Auth::user()->Role == 'Sup'){
-                $token = Auth::user()->createToken('Login-Token',['can:assignroles'])->plainTextToken;
-            }
+           
+            // if(Auth::user()->Role == "Adm"){
+            //     $token = Auth::user()->createToken('Login-Token',['can:doanything'])->plainTextToken;
+            // }
+            // elseif(Auth::user()->Role == 'Sup'){
+            //     $token = Auth::user()->createToken('Login-Token',['can:assignroles'])->plainTextToken;
+            // }
 
+            $request->session()->regenerate();
             $token = Auth::user()->createToken('Login-Token')->plainTextToken;
             $response = [
                 'user' => Auth::user(),
+                'message' => 'User created succesfully',
                 'token' => $token
             ];
             return response($response,200);
