@@ -33,7 +33,7 @@ class ApplicantsController extends Controller
      */
     public function create()
     {
-        return view('Apply.create');
+        //return view('Apply.create');
     }
 
     /**

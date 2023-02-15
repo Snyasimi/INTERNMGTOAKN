@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CommentAndRemark;
 use App\Models\Task;
 use App\Models\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -91,8 +93,17 @@ class TaskController extends Controller
     public function show($id)
     {
         $task= Task::findOrfail($id);
+        //$comments = $task->comments()->first();
+        //CHANGE THE FILTER CONDITION TO BE THE AUTHENTICATED USER
+        $comments = CommentAndRemark::where('user_id','01gs58fr25xhg2a7j81wtedd85')->
+                                    where('task_id',$task->id)->get();
         $data = [
-            'task' => $task
+            'task' => $task,
+            'comments' => $comments,
+            
+            //'madeby'=> //$comments->MadeBy()->get()
+            
+          
         ];
         return response()->json($data,200);
     }

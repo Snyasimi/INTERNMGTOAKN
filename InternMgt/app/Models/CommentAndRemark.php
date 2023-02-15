@@ -19,7 +19,7 @@ class CommentAndRemark extends Model
         return $this->belongsTo(Task::class);
     }
     public function MadeBy(){
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id');
     }
     
 }
