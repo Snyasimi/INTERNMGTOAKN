@@ -19,6 +19,12 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
+
+     public function __construct(){
+        $this->middleware('ability:doanything,assignroles')->except(['show','update','edit','destroy']);
+     }
     public function index()
     {
         //Display innterns

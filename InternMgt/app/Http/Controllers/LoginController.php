@@ -19,14 +19,17 @@ class LoginController extends Controller
            
             if(Auth::user()->Role == 1){
                 $token = Auth::user()->createToken('Login-Token',['doanything'])->plainTextToken;
+                //REDIRECT TO ADMIN PAGE
             }
             elseif(Auth::user()->Role == 2){
                 $token = Auth::user()->createToken('Login-Token',['assignroles'])->plainTextToken;
+                //REDIRECT TO SUPERVISOR PAGE
             }
 
-            //$request->session()->regenerate();
+           
             else{
             $token = Auth::user()->createToken('Login-Token',['intern'])->plainTextToken;
+            //REDIRECT TO INTERNPAGE
             }
             $response = [
                 'user' => Auth::user(),

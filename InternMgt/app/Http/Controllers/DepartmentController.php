@@ -13,6 +13,9 @@ class DepartmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct(){
+        $this->middleware('ability:doanything,assignroles');
+     }
     public function index()
     {
         $Departments = Department::all();

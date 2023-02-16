@@ -17,6 +17,11 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct(){
+        $this->middleware('ability:doanything,assignroles')->except(['show','update','edit']);
+     }
+
     public function index()
     {
         //Get the tasks assigned to the authenticated user
@@ -143,18 +148,32 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
+        
         try{
-
+            $user_id = $request->input('User_id');
+            $user = User::findorfail($user_id);
             $task = Task::findorfail($id);
+             //If the supervisor updated the task only things that will be updated is deadline and task
+
+            if($user->Role == 2){
+                $task->Task = $request->input('Task');
+                $task->Deadline = $request->input('Deadline');
+                $task->save();
+                $data = [
+                    'message' => 'Task Changed'
+                ];
+                return response()->json($data, 200);
+            }
+            else{
+
+                $task->Status = $request->input('Status');
+                $task->save();
+                return response()->json(['message' => 'Task done'], 200);
+
+            }
             //When the request came from a supervisor it doesnt have the status field 
             //it is assumed to come from intern so the only thing being updated is the status 
-            $task->Task = $request->input('Task');
-            $task->Deadline = $request->input('Deadline');
-            $task->save();
-            $data = [
-                'message' => 'Task Changed'
-            ];
-            return response()->json($data, 200);
+         
         }
         catch(ModelNotFoundException){
 
