@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Events\AcceptedIntern;
+use App\Models\Applicants;
 use App\Models\Position;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
@@ -21,11 +22,16 @@ class UsersController extends Controller
     public function index()
     {
         //Display innterns
+        $data =[
+            'Users' =>  User::all(),
+            'Applicants' => Applicants::all(),
+            'Interns' => User::where('Role',3)->get(),
+            'Supervisors' => User::where('Role',2)->get()
+        ];
         
-        $user = User::all();
         
         
-        return response()->json([$user],200);
+        return response()->json([$data],200);
         }
 
     
@@ -37,21 +43,21 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
+     {
         $depts = Department::all();
         $Supervisors = User::where('Role',2)->get();
         $roles = Role::all();
         $positions = Position::all();
         
-        $data = [
-            'Departments' => $depts,
-            'Supervisors' => $Supervisors,
-            'Roles' => $roles,
-            'Positions' => $positions
-        ];
+    //     $data = [
+    //         'Departments' => $depts,
+    //         'Supervisors' => $Supervisors,
+    //         'Roles' => $roles,
+    //         'Positions' => $positions
+    //     ];
 
-        return response()->json($data,200);
-        
+    //     return response()->json($data,200);
+    return view('User.create',['depts'=> $depts,'position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);      
     }
 
     /**

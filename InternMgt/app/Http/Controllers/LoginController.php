@@ -17,18 +17,20 @@ class LoginController extends Controller
  
         if (Auth::attempt($credentials)) {
            
-            // if(Auth::user()->Role == "Adm"){
-            //     $token = Auth::user()->createToken('Login-Token',['can:doanything'])->plainTextToken;
-            // }
-            // elseif(Auth::user()->Role == 'Sup'){
-            //     $token = Auth::user()->createToken('Login-Token',['can:assignroles'])->plainTextToken;
-            // }
+            if(Auth::user()->Role == 1){
+                $token = Auth::user()->createToken('Login-Token',['doanything'])->plainTextToken;
+            }
+            elseif(Auth::user()->Role == 2){
+                $token = Auth::user()->createToken('Login-Token',['assignroles'])->plainTextToken;
+            }
 
             //$request->session()->regenerate();
-            $token = Auth::user()->createToken('Login-Token')->plainTextToken;
+            else{
+            $token = Auth::user()->createToken('Login-Token',['intern'])->plainTextToken;
+            }
             $response = [
                 'user' => Auth::user(),
-                'message' => 'User created succesfully',
+                'message' => 'Logged in',
                 'token' => $token
             ];
             return response($response,200);
