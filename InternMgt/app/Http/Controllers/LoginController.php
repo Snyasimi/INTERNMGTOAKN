@@ -18,17 +18,17 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
            
             if(Auth::user()->Role == 1){
-                $token = Auth::user()->createToken('Login-Token',['doanything'])->plainTextToken;
+                $token = Auth::user()->createToken('Login-Token',['Admin'])->plainTextToken;
                 //REDIRECT TO ADMIN PAGE
             }
             elseif(Auth::user()->Role == 2){
-                $token = Auth::user()->createToken('Login-Token',['assignroles'])->plainTextToken;
+                $token = Auth::user()->createToken('Login-Token',['Supervisor'])->plainTextToken;
                 //REDIRECT TO SUPERVISOR PAGE
             }
 
            
             else{
-            $token = Auth::user()->createToken('Login-Token',['intern'])->plainTextToken;
+            $token = Auth::user()->createToken('Login-Token',['Intern'])->plainTextToken;
             //REDIRECT TO INTERNPAGE
             }
             $response = [

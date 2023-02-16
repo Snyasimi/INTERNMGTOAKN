@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('Name');
 	    $table->string('Email')->unique();
 	    $table->integer('PhoneNumber');
-
+        //DROP
 	    $table->bigInteger('department_id');
 	    $table->foreign('department_id')->references('id')->on('departments');
         

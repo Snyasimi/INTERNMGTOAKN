@@ -50,7 +50,7 @@ class ApplicantsController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request->all());
+        
 	     $validate = $request->validate([
 	    	'Name' => ['required'],
 		    'Email' => ['required','unique:applicants,users'],
@@ -62,9 +62,9 @@ class ApplicantsController extends Controller
 
         
 	   
-        //dd($request->all());
+        
 	     $url_to_file = $request->file('Cv')->store('cv');
-        //$path = $url_to_file;
+        
 	   
             
 	   $applicant = Applicants::create([
@@ -75,7 +75,7 @@ class ApplicantsController extends Controller
 		'url_to_file' => $url_to_file,
         'Rating'=> 0
 	   ]);
-        //dd($applicant);
+        
 	    return response()->json(["message" => "Created"], 201);
 
 

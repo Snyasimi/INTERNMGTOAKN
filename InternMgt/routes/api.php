@@ -28,14 +28,19 @@ Route::get('/',[UsersController::class,'index']);
 Route::post('login',[LoginController::class,'login'])->name('login');
 
 Route::middleware(['auth:sanctum'])->group(function(){
-	Route::post('logout',[LoginController::class,'logout']);
-	Route::resource('Task',TaskController::class);
-	Route::resource('User',Userscontroller::class)->middleware(['ability:doanything,assigneoles']);
+	
+			Route::resource('User',Userscontroller::class);
+			Route::resource('Apply',ApplicantsController::class);
+			Route::resource('Task',TaskController::class);
+			Route::resource('Department',DepartmentController::class);
+			Route::resource('Position',PositionController::class);
+            Route::resource('Roles',RolesController::class);
+	
 
-	Route::resource('Department',DepartmentController::class);
-	Route::resource('Apply',ApplicantsController::class);
+	Route::post('logout',[LoginController::class,'logout']);	
 	Route::post('Comment',[CommentController::class,'store']);
-	Route::resource('Roles',RolesController::class);
-	Route::resource('Position',PositionController::class);
+	
+	
 	}
 );
+

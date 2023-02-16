@@ -14,7 +14,7 @@ class DepartmentController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function __construct(){
-        $this->middleware('ability:doanything,assignroles');
+        $this->middleware('ability:Admin,Supervisor');
      }
     public function index()
     {
@@ -44,6 +44,10 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
+        $validate = $request->validate([
+	    	'DeptName' => ['required'],
+            	
+	    ]);
         $dept = new Department;
         $dept->DepartmentName = $request->input('DeptName');
         $dept->save();

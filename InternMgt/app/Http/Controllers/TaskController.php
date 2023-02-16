@@ -19,14 +19,14 @@ class TaskController extends Controller
      */
 
     public function __construct(){
-        $this->middleware('ability:doanything,assignroles')->except(['show','update','edit']);
+        $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit']);
      }
 
     public function index()
     {
         //Get the tasks assigned to the authenticated user
         $user =Auth::user();
-        if($user->Role == "SUP"){
+        if($user->Role == 2){
            
             $tasks = Task::where('AssignedBy',$user->user_id)->get();
              $data = [
@@ -40,6 +40,7 @@ class TaskController extends Controller
                     $tasks = Task::where('AssignedTo',$user->user_id)->get();
                      $data = [
                         'Tasks' => $tasks
+
                      ];
                     return response()->json($data,200);
                     
@@ -74,6 +75,13 @@ class TaskController extends Controller
     //TODO REMOVE THE ID FROM THE BINDING USE AUTH USER ONLY
     public function store(Request $request)
     {
+
+        $validate = $request->validate([
+	    	'AssignedTo' => ['required'],
+            'Task' => ['required'],
+            'Deadline' => ['required']	
+	    ]);
+
 	    //Authenticated user obviously an admin tho check the roles
         $Supervisor = User::findorfail('01gsb3zwdxn7r1pnep9xq9hv7f');
         //$Supervisor = Auth::user();

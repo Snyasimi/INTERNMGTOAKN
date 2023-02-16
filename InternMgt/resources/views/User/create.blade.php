@@ -49,7 +49,7 @@
                <select name="Supervisor">
                     <option value=""></option>
                 @foreach($Supervisors as $Supervisor)
-                    <option value="{{$Supervisor->id}}">{{$Supervisor->Name}}</option>
+                    <option value="{{$Supervisor->user_id}}">{{$Supervisor->Name}}</option>
                 @endforeach
 
             </label>

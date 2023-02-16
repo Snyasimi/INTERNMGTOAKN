@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Events\AcceptedIntern;
 use App\Models\Applicants;
 use App\Models\Position;
+use App\Models\Task;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,16 +24,24 @@ class UsersController extends Controller
 
 
      public function __construct(){
-        $this->middleware('ability:doanything,assignroles')->except(['show','update','edit','destroy']);
+        $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
      }
     public function index()
     {
         //Display innterns
+
         $data =[
             'Users' =>  User::all(),
+            'Total Users' => User::all()->count(),
+
             'Applicants' => Applicants::all(),
+            'Total Applicants' => Applicants::all()->count(),
+
             'Interns' => User::where('Role',3)->get(),
-            'Supervisors' => User::where('Role',2)->get()
+            'Total Interns' => User::where('Role',3)->count(),
+
+            'Supervisors' => User::where('Role',2)->get(),
+            'Total Supervisors' => User::where('Role',2)->count(),
         ];
         
         
@@ -55,15 +64,17 @@ class UsersController extends Controller
         $roles = Role::all();
         $positions = Position::all();
         
-    //     $data = [
-    //         'Departments' => $depts,
-    //         'Supervisors' => $Supervisors,
-    //         'Roles' => $roles,
-    //         'Positions' => $positions
-    //     ];
+        $data = [
+            'Departments' => $depts,
+            'Supervisors' => $Supervisors,
+            'Roles' => $roles,
+            'Positions' => $positions
+        ];
 
-    //     return response()->json($data,200);
-    return view('User.create',['depts'=> $depts,'position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);      
+        return response()->json($data,200);
+
+    //return view('User.create',['depts'=> $depts,'position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);      
+    
     }
 
     /**
@@ -74,6 +85,16 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
+
+        $validate = $request->validate([
+	    	'Name' => ['required'],
+		    'Email' => ['required','unique:applicants,users'],
+		    'PhoneNumber' =>['min_digits:8'],
+		    'Position' => ['required'],
+		    'Role' => ['required'],
+            'Department' => ['required']
+	
+	    ]);
         
         $user = new User;
         $user->Name = $request->input('Name');
@@ -103,11 +124,25 @@ class UsersController extends Controller
     {
         try{
             $user = User::findorfail($id);
-            $data = [
-                'User' => $user
-            ];
 
-            return response()->json($data,200);
+            if($user->Role == 2){
+
+                $data =[
+                   'User' => $user,
+                   "Interns" => User::where('Supervisor',$user->user_id)->get(),
+                   "Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->get()
+                ];
+                return response()->json($data,200);
+            }
+
+            else{  
+                $data = [
+                    'User' => $user
+                ];
+                return response()->json($data,200);
+        }
+
+            
         }
         catch(ModelNotFoundException){
              return response()->json([

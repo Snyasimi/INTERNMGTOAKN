@@ -14,7 +14,7 @@ class RolesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function __construct(){
-        $this->middleware('ability:doanything');
+        $this->middleware('ability:Admin');
      }
     public function index()
     {
