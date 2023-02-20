@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\AcceptedForInterview;
 use App\Mail\InternAccepted;
+use App\Models\Applicants;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
@@ -29,5 +30,6 @@ class SendInterviewEmail
     public function handle(AcceptedForInterview $event)
     {
         Mail::to($event->Email)->send(new InternAccepted);
+        Applicants::where('Email',$event->Email)->update(['ApplicationStatus' => 'Accepted For Interview']);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\AcceptedForInterview;
 use App\Models\Position;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
@@ -35,11 +36,11 @@ class ApplicantsController extends Controller
     public function create()
     {
         $positions = Position::all();
-        //return view('Apply.create',['position' => $positions]);
-        $data =[
-            'positions' => $positions
-        ];
-        return response()->json($data,200);
+        return view('Apply.create',['position' => $positions]);
+        // $data =[
+        //     'positions' => $positions
+        // ];
+        // return response()->json($data,200);
     }
 
     /**
@@ -50,32 +51,35 @@ class ApplicantsController extends Controller
      */
     public function store(Request $request)
     {
-        
+       // dd($request->all());
 	     $validate = $request->validate([
 	    	'Name' => ['required'],
 		    'Email' => ['required','unique:applicants,users'],
 		    'PhoneNumber' =>['min_digits:8'],
 		    'Position' => ['required'],
-		    'Cv'=>['file']
-	
+		    'Cv'=>['required','file'],
+            'AttachmentLetter' => ['required','file']
+
 	    ]);
 
-        
-	   
-        
-	     $url_to_file = $request->file('Cv')->store('cv');
-        
-	   
-            
+
+        //dd($validate);
+
+	     $url_to_cv = $request->file('Cv')->store('cv');
+         $url_to_attachment_letter = $request->file('AttachmentLetter')->store('cv');
+
+         
+
 	   $applicant = Applicants::create([
 	    'Name' => $request->input('Name'),
 		'Email' => $request->input('Email'),
 		'PhoneNumber' => $request->input('PhoneNumber'),
 		'Position' => $request->input('Position'),
-		'url_to_file' => $url_to_file,
+		'url_to__cv_file' => $url_to_cv,
+        'url_to_attachment_letter' => $url_to_attachment_letter,
         'Rating'=> 0
 	   ]);
-        
+
 	    return response()->json(["message" => "Created"], 201);
 
 
@@ -90,12 +94,12 @@ class ApplicantsController extends Controller
     public function show($id)
     {
         try{
-       
+
 	        $applicant = Applicants::findorfail($id);
 	        $cv = Storage::url($applicant->url_to_file);
             $data = [
                 'Applicant' => $applicant,
-          
+
                 'message' => 'Showing applicant'
             ];
 	        return response()->json($data,200);
@@ -104,7 +108,7 @@ class ApplicantsController extends Controller
             $data = [
                 'message' => 'Model not found'
             ];
-        
+
             return response()->json($data, 404);
 
         };
@@ -116,9 +120,11 @@ class ApplicantsController extends Controller
      * @param  \App\Models\Applicants  $applicants
      * @return \Illuminate\Http\Response
      */
-    public function edit(Applicants $applicants)
+    public function edit($id)
     {
-        //
+        
+        $app =  Applicants::findorfail($id);
+        return $app;
     }
 
     /**
@@ -131,18 +137,30 @@ class ApplicantsController extends Controller
     public function update(Request $request,$id)
     {
         try{
-            $Applicant = Applicants::findorfail($id); 
-            $data = [
-                'message' => 'Updated successfuly'
-            ];
-        
-            return response()->json($data, 200);
+            $Applicant = Applicants::findorfail($id);
+
+            if($request->has('ApplicationStatus'))
+            {
+                AcceptedForInterview::dispatch($Applicant);
+                $data = [
+                    'message' => 'Email Sent successfuly'
+                ];
+    
+                return response()->json($data, 200);
+            }
+            else
+            {
+                return response()->json(["message" => 'not sent'], 200);
+            }
+
+
+           
         }
         catch(ModelNotFoundException){
             $data = [
                 'message' => 'Model not found'
             ];
-        
+
             return response()->json($data, 404);
 
         };

@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\AcceptedIntern;
+use App\Models\Applicants;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -33,5 +34,7 @@ class AddApplicantToUser
             'PhoneNumber'=> $event->PhoneNumber,
             'Role' => $event->Role,
         ]);
+
+        Applicants::where('Email',$event->Email)->update(['ApplicationStatus' => 'Accepted']);
     }
 }
