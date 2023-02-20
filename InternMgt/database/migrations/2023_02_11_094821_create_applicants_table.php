@@ -20,7 +20,7 @@ return new class extends Migration
 		$table->integer('PhoneNumber');
 		$table->string('Position');
 		$table->string('url_to_file');
-		$table->integer('Rating',0);
+		$table->string('ApplicationStatus');
             $table->timestamps();
         });
     }

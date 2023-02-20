@@ -19,6 +19,9 @@
             <label for="Task">Task 
                 <input type="text" required name="Task"/>
             </label><br>
+            <label for="Task">Task Description
+                <input type="text" required name="TaskDescription"/>
+            </label><br>
             <label for="Deadline">Deadline
                 <input type="date" required name="Deadline" />
             </label><br>

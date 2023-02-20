@@ -15,14 +15,10 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-
-            //$table->bigInteger('AssignedBy');
             $table->foreignUlid('AssignedBy')->references('user_id')->on('users');
-
-            //$table->bigInteger('AssignedTo');
             $table->foreignUlid('AssignedTo')->references('user_id')->on('users');
-
             $table->string('Task');
+            $table->string('Description');
             $table->date('Deadline');
             $table->boolean("Status",false);
 

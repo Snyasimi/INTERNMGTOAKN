@@ -26,17 +26,31 @@ use App\Models\User;
 Route::get('/',[UsersController::class,'index']);
 //Route::resource('login',LoginController::class);
 Route::post('login',[LoginController::class,'login'])->name('login');
+Route::resource('Apply',ApplicantsController::class);
 
+// PROTECTED ROUTES
 Route::middleware(['auth:sanctum'])->group(function(){
-	
-			Route::resource('User',Userscontroller::class);
-			Route::resource('Apply',ApplicantsController::class);
-			Route::resource('Task',TaskController::class);
-			Route::resource('Department',DepartmentController::class);
-			Route::resource('Position',PositionController::class);
-            Route::resource('Roles',RolesController::class);
-	
 
+	Route::prefix('Admin')->group(function(){
+
+		Route::get('User/Dashboard',[UsersController::class,'index'])->name('AdminDashboard');
+		Route::get('User/Supervisors',[UsersController::class,'index'])->name('AdminSupervisors');
+		Route::get('User/Applicants',[UsersController::class,'index'])->name('AdminApplicants');
+	
+	})->middleware('ability:Admin');
+
+	Route::prefix('Supervisor')->group(function(){
+
+		Route::get('User/AssignedTasks',[UsersController::class,'index'])->name('SupervisorAssignedTasks');
+		Route::get('User/MyInterns',[UsersController::class,'index'])->name('SupervisorMyInterns');
+		
+	
+	})->middleware('ability:Admin');
+
+	Route::resource('User',Userscontroller::class);
+	Route::resource('Task',TaskController::class);
+	Route::resource('Position',PositionController::class);
+    Route::resource('Roles',RolesController::class);
 	Route::post('logout',[LoginController::class,'logout']);	
 	Route::post('Comment',[CommentController::class,'store']);
 	

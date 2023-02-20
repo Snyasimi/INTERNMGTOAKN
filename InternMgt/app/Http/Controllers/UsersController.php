@@ -22,34 +22,117 @@ class UsersController extends Controller
      */
 
 
+    //  public function __construct(){
+    //     $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
+    //  }
 
-     public function __construct(){
-        $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
-     }
-    public function index()
+
+
+
+    public function index(Request $request)
     {
-        //Display innterns
+        //Display Details depending on the role
 
-        $data =[
-            'Users' =>  User::all(),
-            'Total Users' => User::all()->count(),
+	    if($request->user()->tokenCan('Admin'))
+	    {
+            switch ($request->path()){
 
-            'Applicants' => Applicants::all(),
-            'Total Applicants' => Applicants::all()->count(),
+                case 'api/Admin/User/Dashboard' :
 
-            'Interns' => User::where('Role',3)->get(),
-            'Total Interns' => User::where('Role',3)->count(),
+                    $data = [
+                        'Total Users' => User::all()->count(),
+                        'Total Supervisors' => User::where('Role',"SUP")->count(),
+                        'Total Interns' => User::where('Role',"INT")->count(),
+                        'Total Applicants' => Applicants::all()->count(),
+                    ];
+                    return response()->json($data,200);
 
-            'Supervisors' => User::where('Role',2)->get(),
-            'Total Supervisors' => User::where('Role',2)->count(),
-        ];
-        
-        
-        
-        return response()->json([$data],200);
+                    break ;
+
+                case 'api/Admin/User/Applicants' :
+
+                    $data = [
+                        'Applicants' => Applicants::all(),
+                    ];
+
+                    return response()->json($data,200);
+
+                    break;
+
+                case 'api/Admin/User/Supervisors' :
+
+                    $data = [
+                        'Supervisors' => User::where('Role',"SUP")->get(),
+                    ];
+                    return response()->json($data,200);
+
+                    break;
+
+                case 'api/Admin/User/Interns' :
+
+                    $data = [
+                        'Interns' => User::where('Role',"INT")->get(),
+                    ];
+                    return response()->json($data,200);
+
+                    break;
+
+                default :
+                    return response()->json(["Message" => "No such route"],400);
+
+                    break;
+
+
+
+
+            }
+
+	    }
+
+        else if($request->user()->tokenCan('Supervisor')){
+
+            switch ($request->path()){
+
+                case 'api/Supervisor/User/AssignedTasks' :
+
+                    $data = [
+                        'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->get(),
+                    ];
+                    return response()->json($data,200);
+
+                    break ;
+
+                case 'api/Supervisor/User/MyInterns' :
+
+                    $data =[
+                        'MyInters' => User::where('Supervisor',$request->user()->user_id)->get(),
+                        
+                    ];
+
+                    return response()->json($data,200);
+
+                    break ;
+
+                default:
+
+                   $data = [
+                        'user' => User::findorfail($request->user()->user_id)
+                    ];
+                    return response()->json($data,200);
+
+            }
+
         }
 
-    
+        else{
+
+            $data = [
+               'user' => $request->user()
+            ];
+
+            return response()->json($data,200);
+        }
+    }
 
 
     /**
@@ -60,10 +143,10 @@ class UsersController extends Controller
     public function create()
      {
         $depts = Department::all();
-        $Supervisors = User::where('Role',2)->get();
+        $Supervisors = User::where('Role','SUP')->get();
         $roles = Role::all();
         $positions = Position::all();
-        
+
         $data = [
             'Departments' => $depts,
             'Supervisors' => $Supervisors,
@@ -71,10 +154,10 @@ class UsersController extends Controller
             'Positions' => $positions
         ];
 
-        return response()->json($data,200);
+      //  return response()->json($data,200);
 
-    //return view('User.create',['depts'=> $depts,'position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);      
-    
+    return view('User.create',['depts'=> $depts,'position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
+
     }
 
     /**
@@ -92,26 +175,22 @@ class UsersController extends Controller
 		    'PhoneNumber' =>['min_digits:8'],
 		    'Position' => ['required'],
 		    'Role' => ['required'],
-            'Department' => ['required']
-	
+
 	    ]);
-        
+
         $user = new User;
         $user->Name = $request->input('Name');
         $user->Email = $request->input('Email');
         $user->PhoneNumber = $request->input('PhoneNumber');
-	    $user->department_id = $request->input('Department');
 	    $user->Position = $request->input('Position');
 	    $user->Role = $request->input('Role');
 
-        $user->Supervisor = $request->input('Supervisor');
+        $user->Supervisor = $request->input('Supervisor',null);
         $user->Status = true;
         $user->password = Hash::make($request->input('password'));
         $user->save();
 
-        return response()->json([
-            "message" => "Successfully created"
-        ],201);
+        return response()->json(["message" => "Successfully created"],201);
     }
 
     /**
@@ -125,7 +204,7 @@ class UsersController extends Controller
         try{
             $user = User::findorfail($id);
 
-            if($user->Role == 2){
+            if($user->Role == "SUP"){
 
                 $data =[
                    'User' => $user,
@@ -135,14 +214,14 @@ class UsersController extends Controller
                 return response()->json($data,200);
             }
 
-            else{  
+            else{
                 $data = [
                     'User' => $user
                 ];
                 return response()->json($data,200);
         }
 
-            
+
         }
         catch(ModelNotFoundException){
              return response()->json([
@@ -150,7 +229,7 @@ class UsersController extends Controller
              ],404);
         }
 
-        
+
     }
 
     /**
@@ -185,10 +264,21 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
-       return response()->json([
-        'message'=>'Updated', 
-        'user' =>$user
-       ]);
+
+        if ($request->has(['SupervisorID','InternID'])){
+
+            $validate = $request->validate([
+                'SupervisorID' => ['required'],
+                'InternID' => ['required']
+            ]);
+
+            User::where('user_id',$validate['InternID'])
+                ->update(['Supervisor' => $validate['SupervisorID']]);
+
+
+            return response()->json(['message'=>'Updated',200]);
+        }
+
     }
 
     /**

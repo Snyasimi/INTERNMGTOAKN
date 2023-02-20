@@ -40,7 +40,7 @@
                 <select name="Role">
                     <option value=""></option>
                 @foreach($roles as $role)
-                    <option value="{{$role->id}}">{{$role->Role}}</option>
+                    <option value="{{$role->Role}}">{{$role->Role}}</option>
                 @endforeach
                 </select>
             </label><br>

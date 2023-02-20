@@ -14,19 +14,21 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
         //dd($credentials);
- 
-        if (Auth::attempt($credentials)) {
-           
-            if(Auth::user()->Role == 1){
+
+	if (Auth::attempt($credentials)) {
+
+            $AUTH_USER = Auth::user();
+
+            if(Auth::user()->Role == "ADM"){
                 $token = Auth::user()->createToken('Login-Token',['Admin'])->plainTextToken;
                 //REDIRECT TO ADMIN PAGE
             }
-            elseif(Auth::user()->Role == 2){
+            elseif($AUTH_USER->Role == "SUP"){
                 $token = Auth::user()->createToken('Login-Token',['Supervisor'])->plainTextToken;
                 //REDIRECT TO SUPERVISOR PAGE
             }
 
-           
+
             else{
             $token = Auth::user()->createToken('Login-Token',['Intern'])->plainTextToken;
             //REDIRECT TO INTERNPAGE
@@ -48,14 +50,16 @@ class LoginController extends Controller
 
         public function logout(Request $request){
 
-            Auth::user()->currentAccessToken()->delete();
-            session()->invalidate();
+		Auth::user()->currentAccessToken()->delete();
+		Auth::user()->tokens()->delete();
+	    	session()->invalidate();
+
             //Auth::logout();
 
             return response()->json([
                 'message'=>"Logged Out"
             ]);
         }
-    
-    
+
+
     }

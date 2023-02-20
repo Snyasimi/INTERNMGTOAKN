@@ -18,16 +18,17 @@ class TaskController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function __construct(){
-        $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit']);
-     }
+    // public function __construct(){
+    //     $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit']);
+    //  }
 
     public function index()
     {
         //Get the tasks assigned to the authenticated user
         $user =Auth::user();
-        if($user->Role == 2){
-           
+
+        if($user->Role == "SUP"){
+
             $tasks = Task::where('AssignedBy',$user->user_id)->get();
              $data = [
                 'Tasks' => $tasks
@@ -36,14 +37,14 @@ class TaskController extends Controller
 
             }
             else{
-                   
+
                     $tasks = Task::where('AssignedTo',$user->user_id)->get();
                      $data = [
                         'Tasks' => $tasks
 
                      ];
                     return response()->json($data,200);
-                    
+
                }
      }
 
@@ -61,7 +62,7 @@ class TaskController extends Controller
         //     "message" => "Dispalying interns"
         // ];
         // return response()->json($data,200);
-            $int = User::where('Role','3')->get();
+            $int = User::where('Role','INT')->get();
         return view('Task.create',['Interns'=> $int]);
     }
 
@@ -79,20 +80,22 @@ class TaskController extends Controller
         $validate = $request->validate([
 	    	'AssignedTo' => ['required'],
             'Task' => ['required'],
-            'Deadline' => ['required']	
+            'TaskDescription' => ['required'],
+            'Deadline' => ['required']
 	    ]);
 
 	    //Authenticated user obviously an admin tho check the roles
-        $Supervisor = User::findorfail('01gsb3zwdxn7r1pnep9xq9hv7f');
-        //$Supervisor = Auth::user();
+        //$Supervisor = User::findorfail('01gsm95rx08arjmh1p0erp49fv');
+        $Supervisor = Auth::user();
 	    $Task = new Task;
-	    $Task->AssignedTo = $request->input('AssignedTo');
+	    $Task->AssignedTo = $validate['AssignedTo'];
 	    $Task->Task = $request->input('Task');
+        $Task->Description = $request->input('TaskDescription');
 	    $Task->Deadline = $request->date('Deadline');
         //ADD DESCRIPTION
 	    $Task->Status = false;
 	    $Supervisor->Assign()->save($Task);
-	    
+
         $data = [
             "message" => 'Task assigned'
         ];
@@ -117,7 +120,7 @@ class TaskController extends Controller
         $data = [
             'task' => $task,
             'comments' => $comments,
-            
+
             //'madeby'=> //$comments->MadeBy()->get()
         ];
         return response()->json($data,200);
@@ -156,7 +159,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         try{
             $user_id = $request->input('User_id');
             $user = User::findorfail($user_id);
@@ -179,9 +182,9 @@ class TaskController extends Controller
                 return response()->json(['message' => 'Task done'], 200);
 
             }
-            //When the request came from a supervisor it doesnt have the status field 
-            //it is assumed to come from intern so the only thing being updated is the status 
-         
+            //When the request came from a supervisor it doesnt have the status field
+            //it is assumed to come from intern so the only thing being updated is the status
+
         }
         catch(ModelNotFoundException){
 
@@ -190,7 +193,7 @@ class TaskController extends Controller
 
         }
 
-    
+
 
     /**
      * Remove the specified resource from storage.
@@ -205,7 +208,7 @@ class TaskController extends Controller
             $task = Task::findorfail($id);
             $task->delete();
             return response()->json(["message" => 'Task deleted'],410);
-            
+
         }
         catch(ModelNotFoundException){
             return response()->json(["message" => 'Task does not exist'],404);

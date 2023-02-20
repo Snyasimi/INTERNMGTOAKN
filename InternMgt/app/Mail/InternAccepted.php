@@ -32,8 +32,8 @@ class InternAccepted extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Intern Accepted',
-            from : new Address('nyasimisolo@gmail.com','steve')
+            subject: "You're Accepted",
+            //from : new Address('nyasimisolo@gmail.com','steve')
 
         );
     }
