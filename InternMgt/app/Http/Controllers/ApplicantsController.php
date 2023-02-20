@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\InterviewPassed;
 use App\Events\InterviewStatus;
 use App\Models\Position;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -165,7 +166,7 @@ class ApplicantsController extends Controller
                     return response()->json($data, 200);
                 case 'Passed' :
                         $Email_body = "Passed Interview";
-                        InterviewStatus::dispatch($Applicant,$Email_body);
+                        InterviewPassed::dispatch($Applicant);
                         $data = [
                             'message' => 'Email Sent successfuly'
                         ];
