@@ -33,7 +33,7 @@ class InternAccepted extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: "You're Accepted",
+            subject: "Interview Application Status",
             //from : new Address('nyasimisolo@gmail.com','steve')
 
         );
@@ -47,7 +47,7 @@ class InternAccepted extends Mailable
     public function content()
     {
         return new Content(
-            view: 'Mail.InternAccepted',
+            view: 'Mail.Interviewstatus',
             with : ['Email_body' => $this->Email_body],
         );
     }

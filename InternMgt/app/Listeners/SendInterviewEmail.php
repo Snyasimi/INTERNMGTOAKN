@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\AcceptedForInterview;
+use App\Events\InterviewStatus;
 use App\Mail\InternAccepted;
 use App\Models\Applicants;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,10 +24,10 @@ class SendInterviewEmail
     /**
      * Handle the event.
      *
-     * @param  \App\Events\AcceptedForInterview  $event
+     * @param  \App\Events\InterviewStatus  $event
      * @return void
      */
-    public function handle(AcceptedForInterview $event)
+    public function handle(InterViewStatus $event)
     {
         Mail::to($event->Email)->send(new InternAccepted($event->Email_body));
         Applicants::where('Email',$event->Email)->update(['ApplicationStatus' => 'Accepted For Interview']);

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Events\AcceptedForInterview;
+use App\Events\InterviewStatus;
 use App\Models\Position;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
@@ -137,17 +137,38 @@ class ApplicantsController extends Controller
     public function update(Request $request,$id)
     {
         try{
+
             $Applicant = Applicants::findorfail($id);
 
             if($request->has('ApplicationStatus'))
             {
-                $Email_body = $request->input('EmailBody');
-                AcceptedForInterview::dispatch($Applicant,$Email_body);
-                $data = [
-                    'message' => 'Email Sent successfuly'
-                ];
-    
-                return response()->json($data, 200);
+               switch($request->input('ApplicationStatus'))
+               {
+
+                case 'Accepted':
+                    $Email_body = $request->input('EmailBody');
+                    InterviewStatus::dispatch($Applicant,$Email_body);
+                    $data = [
+                        'message' => 'Email Sent successfuly'
+                    ];
+        
+                    return response()->json($data, 200);
+
+                    break;
+                case 'Declined' :
+                    $Email_body = "Declined";
+                    InterviewStatus::dispatch($Applicant,$Email_body);
+                    $data = [
+                        'message' => 'Email Sent successfuly'
+                    ];
+        
+                    return response()->json($data, 200);
+
+                default:
+                return response()->json(["message" => 'Nothing to update'],200);
+                    
+                    
+               }
             }
             else
             {
