@@ -163,6 +163,14 @@ class ApplicantsController extends Controller
                     ];
         
                     return response()->json($data, 200);
+                case 'Passed' :
+                        $Email_body = "Passed Interview";
+                        InterviewStatus::dispatch($Applicant,$Email_body);
+                        $data = [
+                            'message' => 'Email Sent successfuly'
+                        ];
+            
+                        return response()->json($data, 200);
 
                 default:
                 return response()->json(["message" => 'Nothing to update'],200);
@@ -172,7 +180,7 @@ class ApplicantsController extends Controller
             }
             else
             {
-                return response()->json(["message" => 'not sent'], 200);
+                return response()->json(["message" => '??'], 400);
             }
 
 
