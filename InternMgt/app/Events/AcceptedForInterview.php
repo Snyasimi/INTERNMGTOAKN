@@ -25,14 +25,15 @@ class AcceptedForInterview
     public $PhoneNumber;
     public $Position;
     public $Role;
+    public $Email_body;
     
-    
-    public function __construct(Applicants $Applicant)
+    public function __construct(Applicants $Applicant,$Email_body)
     {
         $this->Name = $Applicant->Name;
         $this->Email = $Applicant->Email;
         $this->PhoneNumber = $Applicant->PhoneNumber;
         $this->Position = $Applicant->Position;
+        $this->Email_body = $Email_body;
         
     }
 

@@ -10,13 +10,13 @@
             <label for="Name">Name
                 <input type="text" name="Name" required>
             </label><br>
-            <label for="Email">Email 
+            <label for="Email">Email
                 <input type="email" required name="Email"/>
             </label><br>
             <label for="PhoneNumber">PhoneNumber
                 <input type="number" required name="PhoneNumber" />
             </label><br>
-            
+
             <label for="Role">Position
                 <select name="Position">
                     <option value=""></option>
@@ -26,13 +26,17 @@
                 </select>
             </label><br>
 
+            <label for="Cv">Your Attachment Letter
+                <input type="file" name="AttachmentLetter" required />
+            </label><br>
+
             <label for="Cv">Your CV
                 <input type="file" name="Cv" required />
             </label><br>
 
             <p>
                 <button type="submit">Submit</button>
-                
+
                 <button type="reset">Clear</button>
             </p>
         </form>

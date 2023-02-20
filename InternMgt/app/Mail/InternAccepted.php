@@ -19,9 +19,10 @@ class InternAccepted extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public $Email_body;
+    public function __construct($email_body)
     {
-        //
+        $this->Email_body = $email_body;
     }
 
     /**
@@ -47,6 +48,7 @@ class InternAccepted extends Mailable
     {
         return new Content(
             view: 'Mail.InternAccepted',
+            with : ['Email_body' => $this->Email_body],
         );
     }
 

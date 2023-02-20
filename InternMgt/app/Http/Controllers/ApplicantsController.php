@@ -141,7 +141,8 @@ class ApplicantsController extends Controller
 
             if($request->has('ApplicationStatus'))
             {
-                AcceptedForInterview::dispatch($Applicant);
+                $Email_body = $request->input('EmailBody');
+                AcceptedForInterview::dispatch($Applicant,$Email_body);
                 $data = [
                     'message' => 'Email Sent successfuly'
                 ];

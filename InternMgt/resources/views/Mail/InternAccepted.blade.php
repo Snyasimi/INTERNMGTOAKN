@@ -1,3 +1,8 @@
-Youre Accepted 
-Come for an interview on 14/02/23
+Youre Accepted
+-----------------------------------
+
+{{$Email_body}}
+
+
+-----------------------------------
 Happy Valenties

@@ -19,7 +19,8 @@ return new class extends Migration
 		$table->string('Email')->unique();
 		$table->integer('PhoneNumber');
 		$table->string('Position');
-		$table->string('url_to_file');
+		$table->string('url_to_cv_file');
+        $table->string('url_to_attachment_letter');
 		$table->string('ApplicationStatus');
             $table->timestamps();
         });
