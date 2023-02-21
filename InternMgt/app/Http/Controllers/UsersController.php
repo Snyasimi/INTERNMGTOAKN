@@ -142,13 +142,13 @@ class UsersController extends Controller
      */
     public function create()
      {
-        $depts = Department::all();
+        
         $Supervisors = User::where('Role','SUP')->get();
         $roles = Role::all();
         $positions = Position::all();
 
         $data = [
-            'Departments' => $depts,
+            
             'Supervisors' => $Supervisors,
             'Roles' => $roles,
             'Positions' => $positions
@@ -156,7 +156,7 @@ class UsersController extends Controller
 
       //  return response()->json($data,200);
 
-    return view('User.create',['depts'=> $depts,'position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
+    return view('User.create',['position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
 
     }
 

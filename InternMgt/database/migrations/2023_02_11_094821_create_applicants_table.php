@@ -22,7 +22,8 @@ return new class extends Migration
 		$table->string('url_to_cv_file');
         $table->string('url_to_attachment_letter');
 		$table->string('ApplicationStatus');
-            $table->timestamps();
+        $table->timestamps();
+        
         });
     }
 

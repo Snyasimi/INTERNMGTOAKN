@@ -69,6 +69,7 @@ class ApplicantsController extends Controller
 	     $url_to_cv = $request->file('Cv')->store('cv');
          $url_to_attachment_letter = $request->file('AttachmentLetter')->store('cv');
 
+         //dd($url_to_cv);
          
 
 	   $applicant = Applicants::create([
@@ -76,9 +77,10 @@ class ApplicantsController extends Controller
 		'Email' => $request->input('Email'),
 		'PhoneNumber' => $request->input('PhoneNumber'),
 		'Position' => $request->input('Position'),
-		'url_to__cv_file' => $url_to_cv,
+		'url_to_cv_file' => $url_to_cv,
         'url_to_attachment_letter' => $url_to_attachment_letter,
-        'Rating'=> 0
+        'ApplicationStatus' => 'Processing'
+        
 	   ]);
 
 	    return response()->json(["message" => "Created"], 201);

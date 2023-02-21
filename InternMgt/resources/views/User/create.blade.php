@@ -17,14 +17,6 @@
                 <input type="number" required name="PhoneNumber" />
             </label><br>
 
-            <label for="Role">Department
-                <select name="Department">
-                    <option value=""></option>
-                @foreach($depts as $d)
-                    <option value="{{$d->id}}">{{$d->DepartmentName}}</option>
-                @endforeach
-                </select>
-            </label><br>
 
             <label for="Role">Position
                 <select name="Position">

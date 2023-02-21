@@ -13,8 +13,9 @@ class Applicants extends Model
         'Email',
         'PhoneNumber',
         'Position',
-        'url_to_file',
-        'Rating'
+        'url_to_cv_file',
+        'url_to_attachment_letter',
+        'ApplicationStatus'
 
     ];
 

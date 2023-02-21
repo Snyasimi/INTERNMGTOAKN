@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('Task');
             $table->string('Description');
             $table->date('Deadline');
-            $table->boolean("Status",false);
+            $table->boolean("Status");
 
             $table->timestamps();
         });

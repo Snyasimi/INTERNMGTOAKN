@@ -12,9 +12,9 @@ class PositionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct(){
-        $this->middleware('ability:Admin,Supervisor');
-     }
+    // public function __construct(){
+    //     $this->middleware('ability:Admin,Supervisor');
+    //  }
     public function index()
     {
         $data =[

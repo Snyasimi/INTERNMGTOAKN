@@ -75,10 +75,6 @@ class User extends Authenticatable
         return $this->belongsTo(User::class,'Supervisor');
     }
 
-    public function Department(){
-
-        return $this->belongsTo(Department::class);
-    }
     public function Assign()
     {
         return $this->hasMany(Task::class, 'AssignedBy');
