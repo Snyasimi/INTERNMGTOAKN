@@ -50,7 +50,8 @@ class User extends Authenticatable
         'PhoneNumber',
         'email_verified_at',
         'Email',
-        'Role'
+        'created_at',
+        'updated_at'
         
     ];
 

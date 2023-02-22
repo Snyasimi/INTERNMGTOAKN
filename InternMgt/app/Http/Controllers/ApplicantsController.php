@@ -55,11 +55,11 @@ class ApplicantsController extends Controller
        // dd($request->all());
 	     $validate = $request->validate([
 	    	'Name' => ['required'],
-		    'Email' => ['required','unique:applicants,users'],
+		    'Email' => ['required'],
 		    'PhoneNumber' =>['min_digits:8'],
 		    'Position' => ['required'],
-		    'Cv'=>['required','file'],
-            'AttachmentLetter' => ['required','file']
+		    //'Cv'=>['required','file'],
+            //'AttachmentLetter' => ['required','file']
 
 	    ]);
 
@@ -83,7 +83,7 @@ class ApplicantsController extends Controller
         
 	   ]);
 
-	    return response()->json(["message" => "Created"], 201);
+	    return response()->json(["message" => "Created"], 200);
 
 
     }

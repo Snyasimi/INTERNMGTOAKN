@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\{RolesController,PositionController,LoginController,UsersController,TaskController,ApplicantsController,DepartmentController};
+use App\Http\Controllers\{RolesController,PositionController,LoginController,UsersController,TaskController,ApplicantsController};
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,7 +19,6 @@ Route::get('/', function () {
 });
 
 Route::resource('/Apply',ApplicantsController::class);
-Route::resource('Dept',DepartmentController::class);
 Route::resource('User',UsersController::class);
 Route::resource('Task',TaskController::class);
 

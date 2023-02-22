@@ -6,6 +6,8 @@ use App\Models\CommentAndRemark;
 use App\Models\Task;
 use App\Models\User;
 
+use App\Events\TaskAssigned;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,11 +84,13 @@ class TaskController extends Controller
             'Task' => ['required'],
             'TaskDescription' => ['required'],
             'Deadline' => ['required']
-	    ]);
+	]);
+
+	$intern = User::findorfail($validate['AssignedTo']); 
 
 	    //Authenticated user obviously an admin tho check the roles
         //$Supervisor = User::findorfail('01gsm95rx08arjmh1p0erp49fv');
-        $Supervisor = Auth::user();
+        $Supervisor = User::findorfail("01gss613z3ew9shvvy6n5emb30");//Auth::user();
 	    $Task = new Task;
 	    $Task->AssignedTo = $validate['AssignedTo'];
 	    $Task->Task = $request->input('Task');
@@ -95,6 +99,8 @@ class TaskController extends Controller
         //ADD DESCRIPTION
 	    $Task->Status = false;
 	    $Supervisor->Assign()->save($Task);
+        
+	    TaskAssigned::dispatch($intern->Email,$validate['TaskDescription']);
 
         $data = [
             "message" => 'Task assigned'

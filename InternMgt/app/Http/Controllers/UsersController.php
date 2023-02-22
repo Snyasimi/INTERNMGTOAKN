@@ -126,11 +126,11 @@ class UsersController extends Controller
 
         else{
 
-            $data = [
-               'user' => $request->user()
-            ];
+            // $data = [
+            //    'user' => $request->user()
+            // ];
 
-            return response()->json($data,200);
+            return response()->json(["user" => $request->user()],200);
         }
     }
 

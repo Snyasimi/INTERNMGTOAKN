@@ -19,6 +19,12 @@ class Applicants extends Model
 
     ];
 
+    protected $hidden = [
+        'url_to_cv_file',
+        "url_to_attachment_letter"
+    ];
+
+
     //protected $hidden = ['Email','PhoneNumber'];
     protected $table="applicants";
 }

@@ -2,11 +2,11 @@
 use App\Http\Controllers\{TaskController,
 	LoginController,
 	UsersController,
-	DepartmentController,
+	AccountActivator,
 	ApplicantsController,
 	CommentController,
 	RolesController,
-	PositionController	
+	PositionController
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +27,7 @@ Route::get('/',[UsersController::class,'index']);
 //Route::resource('login',LoginController::class);
 Route::post('login',[LoginController::class,'login'])->name('login');
 Route::resource('Apply',ApplicantsController::class);
+Route::post('ApplicationStatus',[AccountActivator::class,'CheckStatus']);
 
 // PROTECTED ROUTES
 Route::middleware(['auth:sanctum'])->group(function(){
@@ -36,25 +37,26 @@ Route::middleware(['auth:sanctum'])->group(function(){
 		Route::get('User/Dashboard',[UsersController::class,'index'])->name('AdminDashboard');
 		Route::get('User/Supervisors',[UsersController::class,'index'])->name('AdminSupervisors');
 		Route::get('User/Applicants',[UsersController::class,'index'])->name('AdminApplicants');
-	
+
 	})->middleware('ability:Admin');
 
 	Route::prefix('Supervisor')->group(function(){
 
 		Route::get('User/AssignedTasks',[UsersController::class,'index'])->name('SupervisorAssignedTasks');
 		Route::get('User/MyInterns',[UsersController::class,'index'])->name('SupervisorMyInterns');
-		
-	
+
 	})->middleware('ability:Admin');
 
 	Route::resource('User',Userscontroller::class);
 	Route::resource('Task',TaskController::class);
 	Route::resource('Position',PositionController::class);
     Route::resource('Roles',RolesController::class);
-	Route::post('logout',[LoginController::class,'logout']);	
+    Route::post("Account/Activate",[AccountActivator::class,'Activate']);
+    Route::delete('Account/Deactivate',[AccountActivator::class,'Deactivate']);
+	Route::post('logout',[LoginController::class,'logout']);
 	Route::post('Comment',[CommentController::class,'store']);
-	
-	
+
+
 	}
 );
 

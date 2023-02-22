@@ -13,5 +13,8 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         //
+        //route('Apply.store')
+        'api/Apply',
+        'api/ApplicationStatus' 
     ];
 }
