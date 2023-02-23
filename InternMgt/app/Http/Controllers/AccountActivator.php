@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PasswordReset;
 use App\Models\Applicants;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -85,6 +86,28 @@ class AccountActivator extends Controller
         {
             return response()->json(["message" => "No applicant"],404);
         }
+
+    }
+    public function RequestPasswordReset(Request $request)
+    {
+        $validate = $request->validate([
+            'email' => ['required']
+        ]);
+        $user = User::where('Email', $validate['email'])->first();
+        //return response($user);
+        PasswordReset::dispatch($user);
+
+        return response()->json(["message" => "You will recieve an email to reset your password"],200);
+    }
+    public function ResetPassword(Request $request,$id)
+    {
+        $validate = $request->validate([
+            'password' => ['required']
+        ]);
+        $user = User::findorfail($id);
+        $user->password = bcrypt($validate['password']);
+        $user->save();
+        return response()->json(["message" => "Password Updated"]);
 
     }
 

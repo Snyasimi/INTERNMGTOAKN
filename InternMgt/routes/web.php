@@ -2,7 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\{RolesController,PositionController,LoginController,UsersController,TaskController,ApplicantsController};
+use App\Http\Controllers\{RolesController,
+    PositionController,
+    LoginController,
+    UsersController,
+    TaskController,
+    ApplicantsController,
+    AccountActivator};
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,6 +27,7 @@ Route::get('/', function () {
 Route::resource('/Apply',ApplicantsController::class);
 Route::resource('User',UsersController::class);
 Route::resource('Task',TaskController::class);
+Route::post('PasswordReset',[AccountActivator::class,'RequestPasswordReset'])->name('passwordreset');
 
 Route::resource('Role',RolesController::class);
 Route::resource('Position',PositionController::class);

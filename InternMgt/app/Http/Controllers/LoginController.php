@@ -19,26 +19,37 @@ class LoginController extends Controller
         {
 
 
-            if(Auth::user()->Role == "ADM"){
-                $token = Auth::user()->createToken('Login-Token',['Admin'])->plainTextToken;
-                //REDIRECT TO ADMIN PAGE
-            }
-            elseif(Auth::user()->Role == "SUP"){
-                $token = Auth::user()->createToken('Login-Token',['Supervisor'])->plainTextToken;
-                //REDIRECT TO SUPERVISOR PAGE
-            }
+            if(Auth::user()->Role == "ADM")
+                {
+                    $token = Auth::user()->createToken('Login-Token',['Admin'])->plainTextToken;
+                    //REDIRECT TO ADMIN PAGE
+                   
+                   
+                }
+            elseif(Auth::user()->Role == "SUP")
+                {
+                    $token = Auth::user()->createToken('Login-Token',['Supervisor'])->plainTextToken;
+                    //REDIRECT TO SUPERVISOR PAGE
+                    
+                }
 
 
-            else{
-            $token = Auth::user()->createToken('Login-Token',['Intern'])->plainTextToken;
-            /* REDIRECT TO INTERNPAGE */
-            }
+            else
+                {
+                    $token = Auth::user()->createToken('Login-Token',['Intern'])->plainTextToken;
+                    /* REDIRECT TO INTERNPAGE */
+                   
+                }
             $data = [
                 'user' => Auth::user(),
                 'message' => 'Logged in',
-                'token' => $token
+                'token' => $token,
+                'Role' => [Auth::user()->Role]
+                
             ];
+            
             return response()->json($data,200);
+            
         }
     else
         {

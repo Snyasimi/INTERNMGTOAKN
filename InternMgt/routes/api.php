@@ -28,6 +28,8 @@ Route::get('/',[UsersController::class,'index']);
 Route::post('login',[LoginController::class,'login'])->name('login');
 Route::resource('Apply',ApplicantsController::class);
 Route::post('ApplicationStatus',[AccountActivator::class,'CheckStatus']);
+Route::post('PasswordReset',[AccountActivator::class,'RequestPasswordReset'])->name('Requestpasswordreset');
+Route::post('Reset/{id}',[AccountActivator::class,'ResetPassword'])->name('ResetPassword');
 
 // PROTECTED ROUTES
 Route::middleware(['auth:sanctum'])->group(function(){
@@ -37,6 +39,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
 		Route::get('User/Dashboard',[UsersController::class,'index'])->name('AdminDashboard');
 		Route::get('User/Supervisors',[UsersController::class,'index'])->name('AdminSupervisors');
 		Route::get('User/Applicants',[UsersController::class,'index'])->name('AdminApplicants');
+		Route::get('http://192.168.1.214:3000/adminDashboard',[LoginController::class,'login']);
 
 	})->middleware('ability:Admin');
 

@@ -22,9 +22,9 @@ class UsersController extends Controller
      */
 
 
-    //  public function __construct(){
-    //     $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
-    //  }
+     public function __construct(){
+        $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
+     }
 
 
 
@@ -124,12 +124,8 @@ class UsersController extends Controller
 
         }
 
-        else{
-
-            // $data = [
-            //    'user' => $request->user()
-            // ];
-
+        else
+        {
             return response()->json(["user" => $request->user()],200);
         }
     }
