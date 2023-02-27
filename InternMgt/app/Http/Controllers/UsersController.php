@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Events\AcceptedIntern;
+use App\Events\AssignedSupervisor;
 use App\Models\Applicants;
 use App\Models\Position;
 use App\Models\Task;
@@ -22,9 +23,9 @@ class UsersController extends Controller
      */
 
 
-     public function __construct(){
-        $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
-     }
+    //  public function __construct(){
+    //     $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
+    //  }
 
 
 
@@ -105,7 +106,7 @@ class UsersController extends Controller
                 case 'api/Supervisor/User/MyInterns' :
 
                     $data =[
-                        'MyInters' => User::where('Supervisor',$request->user()->user_id)->get(),
+                        'MyInterns' => User::where('Supervisor',$request->user()->user_id)->get(),
                         
                     ];
 
@@ -270,10 +271,14 @@ class UsersController extends Controller
 
             User::where('user_id',$validate['InternID'])
                 ->update(['Supervisor' => $validate['SupervisorID']]);
+            $Supervisor = User::findorfail($validate['SupervisorID']);
+            $Attachee = User::findorfail($validate['InternID']);
+            AssignedSupervisor::dispatch($Supervisor,$Attachee);
 
 
             return response()->json(['message'=>'Updated',200]);
         }
+     
 
     }
 

@@ -49,10 +49,14 @@ class User extends Authenticatable
         'remember_token',
         'PhoneNumber',
         'email_verified_at',
-        'Email',
-        'created_at',
-        'updated_at'
         
+        'created_at',
+        'updated_at',
+         'Status',
+         'Supervisor',
+         
+         'Role',
+         
     ];
 
 

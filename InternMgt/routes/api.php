@@ -23,13 +23,17 @@ use App\Models\User;
 |
 */
 
-Route::get('/',[UsersController::class,'index']);
+Route::get('/',[LoginController::class,'login']);
 //Route::resource('login',LoginController::class);
 Route::post('login',[LoginController::class,'login'])->name('login');
+
 Route::resource('Apply',ApplicantsController::class);
 Route::post('ApplicationStatus',[AccountActivator::class,'CheckStatus']);
 Route::post('PasswordReset',[AccountActivator::class,'RequestPasswordReset'])->name('Requestpasswordreset');
 Route::post('Reset/{id}',[AccountActivator::class,'ResetPassword'])->name('ResetPassword');
+Route::post("Account/Activate",[AccountActivator::class,'Activate'])->name('ActivateAccount');
+Route::delete('Account/Deactivate',[AccountActivator::class,'Deactivate'])->name('DeactivateAccount');
+Route::resource('Position',PositionController::class);
 
 // PROTECTED ROUTES
 Route::middleware(['auth:sanctum'])->group(function(){
@@ -52,12 +56,10 @@ Route::middleware(['auth:sanctum'])->group(function(){
 
 	Route::resource('User',Userscontroller::class);
 	Route::resource('Task',TaskController::class);
-	Route::resource('Position',PositionController::class);
+	
     Route::resource('Roles',RolesController::class);
-    Route::post("Account/Activate",[AccountActivator::class,'Activate']);
-    Route::delete('Account/Deactivate',[AccountActivator::class,'Deactivate']);
-	Route::post('logout',[LoginController::class,'logout']);
 	Route::post('Comment',[CommentController::class,'store']);
+	Route::post('logout',[LoginController::class,'logout']);
 
 
 	}

@@ -3,10 +3,12 @@
 namespace App\Listeners;
 
 use App\Events\InterviewPassed;
+use App\Mail\PassedInterview;
 use App\Models\Applicants;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Mail;
 
 class SendAcceptanceEmail
 {
@@ -29,7 +31,7 @@ class SendAcceptanceEmail
     public function handle(InterviewPassed $event)
     {
           
-        User::create([
+        $user = User::create([
             'Name' => $event->Name,
             'Email' => $event->Email,
             'PhoneNumber'=> $event->PhoneNumber,
@@ -38,7 +40,7 @@ class SendAcceptanceEmail
             'Status' => false
             
         ]);
-
+        Mail::to($event->Email)->send(new PassedInterview($user->user_id));
         Applicants::where('Email',$event->Email)->update(['ApplicationStatus' => 'Accepted']);
     }
 }

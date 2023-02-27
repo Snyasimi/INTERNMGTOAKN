@@ -17,6 +17,7 @@ class LoginController extends Controller
 
 	if (Auth::attempt($credentials))
         {
+            
 
 
             if(Auth::user()->Role == "ADM")
@@ -61,9 +62,12 @@ class LoginController extends Controller
         }
 
         public function logout(Request $request){
-
+            
+        
+       
 		Auth::user()->currentAccessToken()->delete();
 		Auth::user()->tokens()->delete();
+        
 	    	session()->invalidate();
 
             //Auth::logout();

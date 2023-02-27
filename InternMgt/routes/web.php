@@ -28,6 +28,7 @@ Route::resource('/Apply',ApplicantsController::class);
 Route::resource('User',UsersController::class);
 Route::resource('Task',TaskController::class);
 Route::post('PasswordReset',[AccountActivator::class,'RequestPasswordReset'])->name('passwordreset');
+Route::get('Activate',[AccountActivator::class,'active'])->name('Activate');
 
 Route::resource('Role',RolesController::class);
 Route::resource('Position',PositionController::class);

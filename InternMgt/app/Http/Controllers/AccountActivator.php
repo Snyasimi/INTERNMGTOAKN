@@ -10,27 +10,32 @@ use App\Models\User;
 
 class AccountActivator extends Controller
 {
+    public function active()
+    {
+        return view('AccountActivator.Activate');
+    }
     public function Activate(Request $request)
     {
         try
         {
 
             $validate = $request->validate([
-                'email' => ['required,unique:applicants'],
+                'email' => ['required'],
                 'password' => ['required']
             ]);
+             
+            $user = User::where('Email',$validate['email'])->first();
 
-            $user = User::where('Email',$validate['email'])->get();
-            if ($user)
+            if ($user) 
             {
-                $user->Status->true;
-                $user->password = $validate['password'];
+                $user->Status=true;
+                $user->password = bcrypt($validate['password']);
                 $user->save();
 
                 return response()->json(["message"=> "Password Updated"],201);
             }
             else
-            {
+           {
                 return response()->json(["message" => "Please Apply to Login"],401);
             }
 
@@ -45,6 +50,10 @@ class AccountActivator extends Controller
 
     }
     public function Deactivate($id)
+    /*When the accepted intern declines the invitaion/internship opportunity
+    *the account is deleted from the users table
+    * but the application still remains in the applicants table 
+    */
     {
         try
         {
@@ -71,7 +80,7 @@ class AccountActivator extends Controller
             if (!$applicant == null)
             {
                 $data = [
-                    'Applicant' => $applicant
+                    'ApplicationStatus' => $applicant->ApplicationStatus
                 ];
                 return response()->json($data,200);
             }
