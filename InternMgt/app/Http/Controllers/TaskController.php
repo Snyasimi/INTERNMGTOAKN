@@ -119,6 +119,7 @@ class TaskController extends Controller
     {
         try{
         $task= Task::findOrfail($id);
+         
         //$comments = $task->comments()->first();
         //CHANGE THE FILTER CONDITION TO BE THE AUTHENTICATED USER
         $comments = CommentAndRemark::where('user_id','01gs58fr25xhg2a7j81wtedd85')->
@@ -126,8 +127,8 @@ class TaskController extends Controller
         $data = [
             'task' => $task,
             'comments' => $comments,
-
-            //'madeby'=> //$comments->MadeBy()->get()
+            'Supervisor' => $task->Assignedby->Name
+            //'AssignedTo'=> $task->
         ];
         return response()->json($data,200);
     }

@@ -38,7 +38,7 @@ class CommentController extends Controller
         $id = $request->input('Taskid');
         $Task = Task::findorfail($id);
 	    $remark = new CommentAndRemark;
-	    $remark->task_id = $request->input('Taskid');
+	    // $remark->task_id = $request->input('Taskid');
 	    $remark->Comments = $request->input('Comment');
 	    $remark->user_id = $request->input('Userid');
 

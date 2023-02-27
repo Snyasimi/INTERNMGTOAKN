@@ -24,7 +24,8 @@ class User extends Authenticatable
     public $incrementing = false;
     protected $primaryKey = "user_id";
     protected $KeyType = "string";
-    public function uniqueIds(){
+    public function uniqueIds()
+    {
         return ['user_id'];
     }
     protected $fillable = [
@@ -82,7 +83,7 @@ class User extends Authenticatable
 
     public function Assign()
     {
-        return $this->hasMany(Task::class, 'AssignedBy');
+        return $this->hasMany(Task::class, 'AssignedBy','user_id');
     }
     public function AssignTo()
     {

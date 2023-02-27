@@ -19,11 +19,11 @@ class Task extends Model
         return $this->hasMany(CommentAndRemark::class,"task_id");
     }
 
-    public  function AssignedBy(){
-        return $this->belongsTo(User::class);
+    public  function Assignedby(){
+        return $this->belongsTo(User::class,'AssignedBy');
     }
-    public function AssignedTo()
+    public function Assignedto()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'AssignedTo');
     }
 }
