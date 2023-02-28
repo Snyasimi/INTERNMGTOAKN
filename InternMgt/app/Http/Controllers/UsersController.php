@@ -270,7 +270,7 @@ class UsersController extends Controller
             ]);
 
             User::where('user_id',$validate['InternID'])
-                ->update(['Supervisor' => $validate['SupervisorID']]);
+     ->update(['Supervisor' => $validate['SupervisorID']]);
             $Supervisor = User::findorfail($validate['SupervisorID']);
             $Attachee = User::findorfail($validate['InternID']);
             AssignedSupervisor::dispatch($Supervisor,$Attachee);
