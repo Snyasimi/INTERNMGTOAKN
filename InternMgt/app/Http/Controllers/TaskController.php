@@ -97,7 +97,7 @@ class TaskController extends Controller
         $Task->Description = $request->input('TaskDescription');
 	    $Task->Deadline = $request->date('Deadline');
         //ADD DESCRIPTION
-	    $Task->Status = false;
+	    $Task->Status = "Assigned";
 	    $Supervisor->Assign()->save($Task);
         
 	    TaskAssigned::dispatch($intern->Email,$validate['TaskDescription']);
@@ -126,9 +126,9 @@ class TaskController extends Controller
                                     where('task_id',$task->id)->get();
         $data = [
             'task' => $task,
-            'comments' => $comments,
-            'Supervisor' => $task->Assignedby->Name
-            //'AssignedTo'=> $task->
+	    'Supervisor' => $task->Assignedby->Name,
+	    'remarks' => CommentAndRemark::where('user_id',$task->Assignedby->user_id)->where('task_id',$task->id)->first(),
+	    'comment' => CommentAndRemark::where('user_id',$task->Assignedto->user_id)->where('task_id',$task->id)->first() 
         ];
         return response()->json($data,200);
     }
@@ -168,37 +168,34 @@ class TaskController extends Controller
     {
 
         try{
-            $user_id = $request->input('User_id');
-            $user = User::findorfail($user_id);
-            $task = Task::findorfail($id);
-             //If the supervisor updated the task only things that will be updated is deadline and task
+		$task = Task::findorfail($id);
+		$validate = $request->validate(['Status' => ['reqiured']]);
 
-            if($user->Role == 2){
-                $task->Task = $request->input('Task');
-                $task->Deadline = $request->input('Deadline');
-                $task->save();
-                $data = [
-                    'message' => 'Task Changed'
-                ];
-                return response()->json($data, 200);
+		if($task->Status == 'Assigned')
+		{
+			$task->Status = "Completed";
+			$task->save();
+
+			return response()->json(["message" => "Updated"],200);
+		}
+		else
+		{
+			$task->Status = "Assigned";
+			$task->save();
+
+			return response()->json(["message" => "Updated"],200);
+		}
+             
+
             }
-            else{
 
-                $task->Status = $request->input('Status');
-                $task->save();
-                return response()->json(['message' => 'Task done'], 200);
-
-            }
-            //When the request came from a supervisor it doesnt have the status field
-            //it is assumed to come from intern so the only thing being updated is the status
-
-        }
+        
         catch(ModelNotFoundException){
 
             return response()->json(['message' => 'No such task'],404);
         }
 
-        }
+      }
 
 
 

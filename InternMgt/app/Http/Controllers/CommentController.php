@@ -12,9 +12,12 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($id)
     {
-        //
+	    $Task = Task::findorfail($id);
+	    $comments = $Task->comments;
+	    $data = ['comments' => $comments];
+	    return response()->json($data,200);
     }
 
     /**
@@ -35,12 +38,17 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        $id = $request->input('Taskid');
+	    $validate = $request->validate([
+		    'Intern_comment' => ['required'],
+		    'Userid' => ['required']
+		    ]);
+	    $id = $request->input('Taskid');
+
         $Task = Task::findorfail($id);
 	    $remark = new CommentAndRemark;
 	    // $remark->task_id = $request->input('Taskid');
-	    $remark->Comments = $request->input('Comment');
-	    $remark->user_id = $request->input('Userid');
+	    $remark->Comments = $validate['Intern_comment'];
+	    $remark->user_id = $validate['Userid'];
 
         $Task->comments()->save($remark);
  		
@@ -78,7 +86,16 @@ class CommentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+	    $validate = $request->validate([
+	    	'InternComment' => ['required']
+	    ]);
+	    $comment = CommentAndRemark::findorfail($id);
+
+	    $comment->Comments = $validate['InternComment'];
+	    $comment->save();
+
+	    return response()->json(["message" => "updated"],200);
+
     }
 
     /**

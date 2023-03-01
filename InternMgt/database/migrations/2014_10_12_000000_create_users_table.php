@@ -21,7 +21,7 @@ return new class extends Migration
 	    $table->integer('PhoneNumber');
 
         $table->string('Position');
-        $table->foreign('Position')->references('id')->on('positions');
+        $table->foreign('Position')->references('Position')->on('positions');
 
         $table->bigInteger('Role');
         $table->foreign('Role')->references('Role')->on('roles');

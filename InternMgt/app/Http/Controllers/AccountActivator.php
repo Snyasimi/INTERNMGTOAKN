@@ -80,7 +80,7 @@ class AccountActivator extends Controller
             if (!$applicant == null)
             {
                 $data = [
-                    'ApplicationStatus' => $applicant->ApplicationStatus
+                    'ApplicationStatus' => $applicant
                 ];
                 return response()->json($data,200);
             }

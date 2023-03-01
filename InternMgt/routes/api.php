@@ -57,8 +57,10 @@ Route::middleware(['auth:sanctum'])->group(function(){
 	Route::resource('User',Userscontroller::class);
 	Route::resource('Task',TaskController::class);
 	
-    Route::resource('Roles',RolesController::class);
+        Route::resource('Roles',RolesController::class);
 	Route::post('Comment',[CommentController::class,'store']);
+        Route::put('Comment/{id}',[CommentController::class,'update']);
+		Route::get('Comment/{id}',[CommentController::class,'index']);
 	Route::post('logout',[LoginController::class,'logout']);
 
 
