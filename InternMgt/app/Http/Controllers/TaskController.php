@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CommentAndRemark;
 use App\Models\Task;
 use App\Models\User;
-
+use Illuminate\Support\Arr;
 use App\Events\TaskAssigned;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -31,11 +31,18 @@ class TaskController extends Controller
 
         if($user->Role == "SUP"){
 
-            $tasks = Task::where('AssignedBy',$user->user_id)->get();
+		$tasks = Task::where('AssignedBy',$user->user_id)->get();
+		$arrTask = [];
+		foreach($tasks as $task)
+		{
+            $task[$task->Assignedto->Name];
+            $arrTask[] = $task;
+            
+		}
              $data = [
-                'Tasks' => $tasks
+                'Tasks' => $arrTask
              ];
-            return response()->json($data,200);
+            return response()->json($arrTask,200);
 
             }
             else{
@@ -87,10 +94,7 @@ class TaskController extends Controller
 	]);
 
 	$intern = User::findorfail($validate['AssignedTo']); 
-
-	    //Authenticated user obviously an admin tho check the roles
-        //$Supervisor = User::findorfail('01gsm95rx08arjmh1p0erp49fv');
-        $Supervisor = User::findorfail("01gss613z3ew9shvvy6n5emb30");//Auth::user();
+        $Supervisor = Auth::user();
 	    $Task = new Task;
 	    $Task->AssignedTo = $validate['AssignedTo'];
 	    $Task->Task = $request->input('Task');
@@ -122,10 +126,10 @@ class TaskController extends Controller
          
         //$comments = $task->comments()->first();
         //CHANGE THE FILTER CONDITION TO BE THE AUTHENTICATED USER
-        $comments = CommentAndRemark::where('user_id','01gs58fr25xhg2a7j81wtedd85')->
+        $comments = CommentAndRemark::where('user_id',Auth::user())->
                                     where('task_id',$task->id)->get();
         $data = [
-            'task' => $task,
+        'task' => $task,
 	    'Supervisor' => $task->Assignedby->Name,
 	    'remarks' => CommentAndRemark::where('user_id',$task->Assignedby->user_id)->where('task_id',$task->id)->first(),
 	    'comment' => CommentAndRemark::where('user_id',$task->Assignedto->user_id)->where('task_id',$task->id)->first() 

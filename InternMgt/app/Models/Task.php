@@ -13,7 +13,7 @@ class Task extends Model
     }
 
 
-    protected $guarded = [];
+    protected $hidden = ['AssignedTo','AssignedBy','TaskDescription','created_at','updated_at'];
 
     public function comments(){
         return $this->hasMany(CommentAndRemark::class,"task_id");
