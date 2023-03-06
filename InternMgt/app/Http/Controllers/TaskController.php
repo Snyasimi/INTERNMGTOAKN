@@ -131,8 +131,8 @@ class TaskController extends Controller
         $data = [
         'task' => $task,
 	    'Supervisor' => $task->Assignedby->Name,
-	    'remarks' => CommentAndRemark::where('user_id',$task->Assignedby->user_id)->where('task_id',$task->id)->first(),
-	    'comment' => CommentAndRemark::where('user_id',$task->Assignedto->user_id)->where('task_id',$task->id)->first() 
+	    'remarks' => CommentAndRemark::where('user_id',$task->Assignedby->user_id)->where('task_id',$task->id)->get(),
+	    'comment' => CommentAndRemark::where('user_id',$task->Assignedto->user_id)->where('task_id',$task->id)->get() 
         ];
         return response()->json($data,200);
     }
@@ -170,36 +170,54 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $validate = $request->validate([
+            'Task' => ['required'],
+            'Description' => ['required'],
+            'Deadline' => ['required']
+        ]);
+        $Task = Task::findorfail($id);
 
-        try{
-		$task = Task::findorfail($id);
-		$validate = $request->validate(['Status' => ['reqiured']]);
+        $Task->Task = $validate['Task'];
+        $Task->Description = $validate['Description'];
+        $Task->Deadline = $validate['Deadline'];
+        $Task->save();
+        return response()->json(["msg" => "ok"],200);
 
-		if($task->Status == 'Assigned')
-		{
-			$task->Status = "Completed";
-			$task->save();
+    }
 
-			return response()->json(["message" => "Updated"],200);
-		}
-		else
-		{
-			$task->Status = "Assigned";
-			$task->save();
+    public function Complete(Request $request ,$id)
+    {
 
-			return response()->json(["message" => "Updated"],200);
-		}
-             
+	    try{
 
+            $task = Task::findorfail($id);
+            $validate = $request->validate(['Status' => ['reqiured']]);
+    
+            if($task->Status == 'Assigned')
+            {
+                $task->Status = "Completed";
+                $task->save();
+    
+                return response()->json(["message" => "Updated"],200);
+            }
+            else
+            {
+                $task->Status = "Assigned";
+                $task->save();
+    
+                return response()->json(["message" => "Updated"],200);
+            }
+                 
+    
+                }
+    
+            
+            catch(ModelNotFoundException){
+    
+                return response()->json(['message' => 'No such task'],404);
             }
 
-        
-        catch(ModelNotFoundException){
-
-            return response()->json(['message' => 'No such task'],404);
-        }
-
-      }
+    }
 
 
 

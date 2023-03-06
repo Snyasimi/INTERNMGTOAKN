@@ -43,7 +43,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
 		Route::get('User/Dashboard',[UsersController::class,'index'])->name('AdminDashboard');
 		Route::get('User/Supervisors',[UsersController::class,'index'])->name('AdminSupervisors');
 		Route::get('User/Applicants',[UsersController::class,'index'])->name('AdminApplicants');
-		Route::get('http://192.168.1.214:3000/adminDashboard',[LoginController::class,'login']);
+		Route::get('User/Interns',[UsersController::class,'index'])->name('AdminInterns');
 
 	})->middleware('ability:Admin');
 
@@ -55,8 +55,10 @@ Route::middleware(['auth:sanctum'])->group(function(){
 	})->middleware('ability:Admin');
 
 	Route::resource('User',Userscontroller::class);
+
 	Route::resource('Task',TaskController::class);
-	
+	Route::put('Task/Status/{id}',[TaskController::class,'Complete']);
+
         Route::resource('Roles',RolesController::class);
 	Route::post('Comment',[CommentController::class,'store']);
         Route::put('Comment/{id}',[CommentController::class,'update']);

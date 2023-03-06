@@ -31,8 +31,8 @@ class User extends Authenticatable
     protected $fillable = [
         'Name',
         'Email',
-        'PhoneNumber',
-        'Position',
+	'Position',
+	'PhoneNumber',
         'password',
         'Supervisor',
         'Role',
@@ -48,14 +48,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'PhoneNumber',
         'email_verified_at',
-        
         'created_at',
         'updated_at',
          'Status',
-         'Supervisor',
-         
          'Role',
          
     ];
@@ -76,7 +72,7 @@ class User extends Authenticatable
         return $this->hasMany(User::class,'user_id');
     }
 
-    public function Supervisor(){
+    public function supervisor(){
 
         return $this->belongsTo(User::class,'Supervisor');
     }

@@ -41,10 +41,10 @@ class UsersController extends Controller
                 case 'api/Admin/User/Dashboard' :
 
                     $data = [
-                        'Total Users' => User::all()->count(),
-                        'Total Supervisors' => User::where('Role',"SUP")->count(),
-                        'Total Interns' => User::where('Role',"INT")->count(),
-                        'Total Applicants' => Applicants::all()->count(),
+                        'TotalUsers' => User::all()->count(),
+                        'TotalSupervisors' => User::where('Role',"SUP")->count(),
+                        'TotalInterns' => User::where('Role',"INT")->count(),
+                        'TotalApplicants' => Applicants::all()->count(),
                     ];
                     return response()->json($data,200);
 
@@ -72,7 +72,9 @@ class UsersController extends Controller
                 case 'api/Admin/User/Interns' :
 
                     $data = [
-                        'Interns' => User::where('Role',"INT")->get(),
+                        //TODO RETURN FILTER
+                        'Interns' => User::all()
+                    
                     ];
                     return response()->json($data,200);
 
@@ -238,9 +240,11 @@ class UsersController extends Controller
     public function edit($id)
     {
         try{
-            $user = User::findorfail($id);
+		$user = User::findorfail($id);
+		$Supervisors = User::where('Role','SUP')->get();
             $data = [
-                'User' => $user
+		    'User' => $user,
+		    'Supervisors' => $Supervisors
             ];
 
             return response()->json($data,200);
@@ -259,25 +263,85 @@ class UsersController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request,$id)
     {
 
-        if ($request->has(['SupervisorID','InternID'])){
+	if ($request->has(['SupervisorID','InternID']))
+	{
+		$validate = $request->validate([
+			
+			'SupervisorID' => ['required'],
+			'InternID' => ['required']	
+		
+		]);
 
-            $validate = $request->validate([
-                'SupervisorID' => ['required'],
-                'InternID' => ['required']
-            ]);
+		
+		
+		User::where('user_id',$validate['InternID'])
+			
+			->update(['Supervisor' => $validate['SupervisorID']]);
+		
+		$Supervisor = User::findorfail($validate['SupervisorID']);
+		
+		$Attachee = User::findorfail($validate['InternID']);
+		
+		AssignedSupervisor::dispatch($Supervisor,$Attachee);
 
-            User::where('user_id',$validate['InternID'])
-     ->update(['Supervisor' => $validate['SupervisorID']]);
-            $Supervisor = User::findorfail($validate['SupervisorID']);
-            $Attachee = User::findorfail($validate['InternID']);
-            AssignedSupervisor::dispatch($Supervisor,$Attachee);
+
+		return response()->json(['message'=>'Updated',200]);
+	}
+
+ 	else
+	{
+		$role = Auth::user()->Role;
+		$user = User::findorfail($id);
+
+		switch ($role)
+		{
+		case "ADM":
+			$validate = $request->validate([
+				'Name' => ['required'],
+				'Email' => ['required'],
+				'Position' => ['required'],
+				'Supervisor' => ['nullable'],
+				'PhoneNumber' => ['required']
+			]);
+
+			
+			
+			$user->Name = $validate['Name'];
+			$user->Email = $validate['Email'];
+			$user->Position = $validate['Position'];
+			$user->Supervisor = $validate['Supervisor'];
+			$user->PhoneNumber = $validate['PhoneNumber'];
+			$user->save();
+
+         	return response()->json(['Message' => 'ok'],200);
+			
+
+		case "INT" || "SUP":
+			$validate = $request->validate([
+				'Name' => ['required'],
+				'Email' => ['required'],
+				'PhoneNumber' => ['required']
+			]);
+
+			$user->Name = $validate['Name'];
+			$user->PhoneNumber = $validate['PhoneNumber'];
+			$user->Email = $validate['Email'];
+
+			return response()->json(['Message' => 'ok'],200);
 
 
-            return response()->json(['message'=>'Updated',200]);
-        }
+
+
+		default:
+			return response()->json(['Message' => 'Error'],404);
+
+		}
+
+
+	}
      
 
     }
@@ -294,7 +358,7 @@ class UsersController extends Controller
             $user = User::findorfail($id);
             $user->delete();
 
-            return response()->json(['message' => 'User deleted'],410);
+            return response()->json(['message' => 'User deleted'],200);
         }
         catch(ModelNotFoundException){
              return response()->json([

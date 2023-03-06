@@ -66,8 +66,8 @@ class ApplicantsController extends Controller
 
         //dd($validate);
 
-	     $url_to_cv = $request->file('Cv')->store('cv');
-         $url_to_attachment_letter = $request->file('AttachmentLetter')->store('cv');
+	     $url_to_cv = $request->file('Cv')->store('public');
+         $url_to_attachment_letter = $request->file('AttachmentLetter')->store('public');
 
          //dd($url_to_cv);
          
@@ -99,13 +99,17 @@ class ApplicantsController extends Controller
         try{
 
 	        $applicant = Applicants::findorfail($id);
-	        $cv = Storage::url($applicant->url_to_file);
+		$cv = asset(Storage::url($applicant->url_to_cv_file));
+		$attachmentLetter = asset(Storage::url($applicant->url_to_attachment_letter));
             $data = [
-                'Applicant' => $applicant,
+		    'Applicant' => $applicant,
 
+		    'Cv' => $cv,
+		    'Attachmentletter' => $attachmentLetter, 
                 'message' => 'Showing applicant'
-            ];
-	        return response()->json($data,200);
+	    ];
+		return view('Apply.show',['cv'=> $cv,"applicant" => $applicant]);
+	        //return response()->json($data,200);
         }
         catch(ModelNotFoundException){
             $data = [

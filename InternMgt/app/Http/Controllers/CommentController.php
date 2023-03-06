@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\CommentAndRemark;
 use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 class CommentController extends Controller
 {
     /**
@@ -14,8 +15,9 @@ class CommentController extends Controller
      */
     public function index($id)
     {
-	    $Task = Task::findorfail($id);
-	    $comments = $Task->comments;
+	    $comments = CommentAndRemark::where('user_id',Auth::user()->user_id)
+                            ->where('task_id',$id)->get();
+
 	    $data = ['comments' => $comments];
 	    return response()->json($data,200);
     }
