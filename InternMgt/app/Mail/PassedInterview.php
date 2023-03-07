@@ -25,7 +25,7 @@ class PassedInterview extends Mailable
     public function __construct($user_id)
     {
         $this->User_id = $user_id;
-        $this->Signin_url = route('ActivateAccount');
+        $this->Signin_url = route('Setpassword');
         $this->Decline_url = route('DeactivateAccount',['id' => $this->User_id]);
     }
 

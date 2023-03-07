@@ -12,7 +12,7 @@
         <br>
 	{{--CHANGE OBJECT TO PDF--}}
 	<img src = "{{$cv}}" >
-        <object data="{{$cv}}" width="100%" height="100%" >
+        <object data="{{$cv}}" width="100%" height="100vh" >
             <p>Your breowser cannot display</p>
         </object>
 

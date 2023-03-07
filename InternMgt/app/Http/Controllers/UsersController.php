@@ -48,17 +48,21 @@ class UsersController extends Controller
                     ];
                     return response()->json($data,200);
 
-                    break ;
-
                 case 'api/Admin/User/Applicants' :
 
                     $data = [
-                        'Applicants' => Applicants::all(),
+                        'Applicants' => Applicants::where('ApplicationStatus','Processing')->get(),
                     ];
 
                     return response()->json($data,200);
 
-                    break;
+                case 'api/Admin/User/Interviews' :
+
+                    $data = [
+                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->get(),
+                    ];
+    
+                    return response()->json($data,200);
 
                 case 'api/Admin/User/Supervisors' :
 
@@ -69,11 +73,27 @@ class UsersController extends Controller
 
                     break;
 
-                case 'api/Admin/User/Interns' :
+		case 'api/Admin/User/Interns' :
+			$Interns = User::where('Role','INT')->get();
+
+			$CleanedInterns = $Interns->map(function($item)
+			{
+                
+            
+                if(!$item->Supervisor == null)
+                {
+                    $item->supervisor = $item->supervisor->Name;
+                    unset($item['Supervisor']);
+                    return $item;
+                }
+                else
+                return $item;
+				
+			});
 
                     $data = [
                         //TODO RETURN FILTER
-                        'Interns' => User::all()
+			    'Interns' => $CleanedInterns,
                     
                     ];
                     return response()->json($data,200);

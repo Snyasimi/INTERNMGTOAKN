@@ -32,7 +32,8 @@ Route::post('ApplicationStatus',[AccountActivator::class,'CheckStatus']);
 Route::post('PasswordReset',[AccountActivator::class,'RequestPasswordReset'])->name('Requestpasswordreset');
 Route::post('Reset/{id}',[AccountActivator::class,'ResetPassword'])->name('ResetPassword');
 Route::post("Account/Activate",[AccountActivator::class,'Activate'])->name('ActivateAccount');
-Route::delete('Account/Deactivate',[AccountActivator::class,'Deactivate'])->name('DeactivateAccount');
+Route::get("Account/Sign-in",[AccountActivator::class,'active'])->name('Setpassword');
+Route::delete('Account/Deactivate/{id}',[AccountActivator::class,'Deactivate'])->name('DeactivateAccount');
 Route::resource('Position',PositionController::class);
 
 // PROTECTED ROUTES
@@ -44,6 +45,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
 		Route::get('User/Supervisors',[UsersController::class,'index'])->name('AdminSupervisors');
 		Route::get('User/Applicants',[UsersController::class,'index'])->name('AdminApplicants');
 		Route::get('User/Interns',[UsersController::class,'index'])->name('AdminInterns');
+		Route::get('User/Interviews',[UsersController::class,'index'])->name('AdminInterviews');
 
 	})->middleware('ability:Admin');
 

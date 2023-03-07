@@ -20,8 +20,8 @@ class Applicants extends Model
     ];
 
     protected $hidden = [
-        'url_to_cv_file',
-        "url_to_attachment_letter"
+        //'url_to_cv_file',
+        //"url_to_attachment_letter"
     ];
 
 

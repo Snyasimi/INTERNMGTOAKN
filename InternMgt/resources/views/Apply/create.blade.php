@@ -21,7 +21,7 @@
                 <select name="Position">
                     <option value=""></option>
                 @foreach($position as $p)
-                    <option value="{{$p->id}}">{{$p->Position}}</option>
+                    <option value="{{$p->Position}}">{{$p->Position}}</option>
                 @endforeach
                 </select>
             </label><br>

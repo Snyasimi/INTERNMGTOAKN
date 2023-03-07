@@ -89,11 +89,11 @@ class CommentController extends Controller
     public function update(Request $request, $id)
     {
 	    $validate = $request->validate([
-	    	'InternComment' => ['required']
+	    	'Comment' => ['required']
 	    ]);
 	    $comment = CommentAndRemark::findorfail($id);
 
-	    $comment->Comments = $validate['InternComment'];
+	    $comment->Comments = $validate['Comment'];
 	    $comment->save();
 
 	    return response()->json(["message" => "updated"],200);

@@ -62,7 +62,7 @@ class AccountActivator extends Controller
         }
         catch(ModelNotFoundException)
         {
-                         return response()->json(["message" => "Declined"],400);
+                         return response()->json(["message" => "Applicant Not found"],404);
         }
          
 

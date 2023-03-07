@@ -105,11 +105,11 @@ class ApplicantsController extends Controller
 		    'Applicant' => $applicant,
 
 		    'Cv' => $cv,
-		    'Attachmentletter' => $attachmentLetter, 
+		    'AttachmentLetter' => $attachmentLetter, 
                 'message' => 'Showing applicant'
 	    ];
-		return view('Apply.show',['cv'=> $cv,"applicant" => $applicant]);
-	        //return response()->json($data,200);
+	//	return view('Apply.show',['cv'=> $cv,"applicant" => $applicant]);
+	        return response()->json($data,200);
         }
         catch(ModelNotFoundException){
             $data = [
