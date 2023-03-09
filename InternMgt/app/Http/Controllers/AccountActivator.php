@@ -7,6 +7,7 @@ use App\Models\Applicants;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class AccountActivator extends Controller
 {
@@ -103,21 +104,39 @@ class AccountActivator extends Controller
             'email' => ['required']
         ]);
         $user = User::where('Email', $validate['email'])->first();
-        //return response($user);
         PasswordReset::dispatch($user);
 
         return response()->json(["message" => "You will recieve an email to reset your password"],200);
     }
-    public function ResetPassword(Request $request,$id)
+    public function ResetPassword(Request $request)
     {
         $validate = $request->validate([
             'password' => ['required']
         ]);
-        $user = User::findorfail($id);
-        $user->password = bcrypt($validate['password']);
-        $user->save();
-        return response()->json(["message" => "Password Updated"]);
 
+        
+        User::where('user_id',Auth::user()->user_id)->update(['password'=>bcrypt($validate['password'])]);
+     
+        return response()->json(["message" => "Password Updated"]);   
+
+    }
+
+    public function ForgotPassword(Request $request)
+    {
+        try
+        {
+            $validate = $request->validate([
+                'email' => ['required'],
+                'password' => ['required']
+            ]);
+
+            User::firstWhere('Email',$validate['email'])->update(['password'=> bcrypt($validate['password'])]);
+            return response()->json(['message'=>'Password reset'],200);
+        }
+        catch(ModelNotFoundException)
+        {
+            return response()->json(['message'=> 'Does not exist'],404);
+        }
     }
 
 

@@ -18,7 +18,10 @@ return new class extends Migration
 		$table->string('Name');
 		$table->string('Email')->unique();
 		$table->integer('PhoneNumber');
+
 		$table->string('Position');
+        $table->foreign('Position')->references('Position')->on('positions');
+
 		$table->string('url_to_cv_file');
         $table->string('url_to_attachment_letter');
 		$table->string('ApplicationStatus');

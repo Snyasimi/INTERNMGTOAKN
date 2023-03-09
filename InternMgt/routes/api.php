@@ -29,8 +29,10 @@ Route::post('login',[LoginController::class,'login'])->name('login');
 
 Route::resource('Apply',ApplicantsController::class);
 Route::post('ApplicationStatus',[AccountActivator::class,'CheckStatus']);
+
 Route::post('PasswordReset',[AccountActivator::class,'RequestPasswordReset'])->name('Requestpasswordreset');
-Route::post('Reset/{id}',[AccountActivator::class,'ResetPassword'])->name('ResetPassword');
+Route::post('ForgotPassword',[AccountActivator::class,'ForgotPassword'])->name('ForgotPasword');
+
 Route::post("Account/Activate",[AccountActivator::class,'Activate'])->name('ActivateAccount');
 Route::get("Account/Sign-in",[AccountActivator::class,'active'])->name('Setpassword');
 Route::delete('Account/Deactivate/{id}',[AccountActivator::class,'Deactivate'])->name('DeactivateAccount');
@@ -57,15 +59,14 @@ Route::middleware(['auth:sanctum'])->group(function(){
 	})->middleware('ability:Admin');
 
 	Route::resource('User',Userscontroller::class);
-
 	Route::resource('Task',TaskController::class);
 	Route::put('Task/Status/{id}',[TaskController::class,'Complete']);
-
-        Route::resource('Roles',RolesController::class);
+    Route::resource('Roles',RolesController::class);
 	Route::post('Comment',[CommentController::class,'store']);
-        Route::put('Comment/{id}',[CommentController::class,'update']);
-		Route::get('Comment/{id}',[CommentController::class,'index']);
+    Route::put('Comment/{id}',[CommentController::class,'update']);
+	Route::get('Comment/{id}',[CommentController::class,'index']);
 	Route::post('logout',[LoginController::class,'logout']);
+	Route::post('Reset',[AccountActivator::class,'ResetPassword'])->name('ResetPassword');
 
 
 	}

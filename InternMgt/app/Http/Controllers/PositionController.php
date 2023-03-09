@@ -107,7 +107,15 @@ class PositionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validate = $request->validate([
+            'Position' => ['required']
+        ]);
+        $Position = Position::findorfail($id);
+        $Position->Position = $validate['Position'];
+        $Position->save();
+
+        return response()->json(['message' => 'Updated'],200);
+
     }
 
     /**
@@ -121,7 +129,7 @@ class PositionController extends Controller
         try{
         $position = Position::findorfail($id);
         $position->delete();
-        return response()->json(['message'=>'Position deleted'],410);
+        return response()->json(['message'=>'Position deleted'],200);
         }
         catch(ModelNotFoundException){
             return response()->json(['message' => 'Position not found'],404);

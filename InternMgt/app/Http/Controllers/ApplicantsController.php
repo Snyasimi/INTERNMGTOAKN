@@ -37,11 +37,11 @@ class ApplicantsController extends Controller
     public function create()
     {
         $positions = Position::all();
-        return view('Apply.create',['position' => $positions]);
-        // $data =[
-        //     'positions' => $positions
-        // ];
-        // return response()->json($data,200);
+
+         $data =[
+             'positions' => $positions
+         ];
+         return response()->json($data,200);
     }
 
     /**
@@ -50,9 +50,9 @@ class ApplicantsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
     public function store(Request $request)
     {
-       // dd($request->all());
 	     $validate = $request->validate([
 	    	'Name' => ['required'],
 		    'Email' => ['required'],
@@ -64,12 +64,8 @@ class ApplicantsController extends Controller
 	    ]);
 
 
-        //dd($validate);
-
-	     $url_to_cv = $request->file('Cv')->store('public');
+	 $url_to_cv = $request->file('Cv')->store('public');
          $url_to_attachment_letter = $request->file('AttachmentLetter')->store('public');
-
-         //dd($url_to_cv);
          
 
 	   $applicant = Applicants::create([
@@ -96,6 +92,9 @@ class ApplicantsController extends Controller
      */
     public function show($id)
     {
+	    /*
+	     * Returns an applicants details 
+	     * */
         try{
 
 	        $applicant = Applicants::findorfail($id);
@@ -108,7 +107,7 @@ class ApplicantsController extends Controller
 		    'AttachmentLetter' => $attachmentLetter, 
                 'message' => 'Showing applicant'
 	    ];
-	//	return view('Apply.show',['cv'=> $cv,"applicant" => $applicant]);
+
 	        return response()->json($data,200);
         }
         catch(ModelNotFoundException){
@@ -129,6 +128,9 @@ class ApplicantsController extends Controller
      */
     public function edit($id)
     {
+	    /*
+	     * Returns an applicants details by id
+	     * */
         
         $app =  Applicants::findorfail($id);
         return $app;
@@ -143,9 +145,16 @@ class ApplicantsController extends Controller
      */
     public function update(Request $request,$id)
     {
+	    /*
+	     *Updates and sends email to the applicant based on the application status
+	     *if the AppliactionStatus is Accepted =>  they are sent an email to come for an interview
+	     *If the application status is Declined they are sent an email notifying them
+	     *If the ApplicationStatus is Passed they are sent an email They can accept or decline the offer
+	     */
         try{
 
             $Applicant = Applicants::findorfail($id);
+            
 
             if($request->has('ApplicationStatus'))
             {
@@ -187,7 +196,7 @@ class ApplicantsController extends Controller
             }
             else
             {
-                return response()->json(["message" => '??'], 400);
+                return response()->json(["message" => "Bad request"], 400);
             }
 
 
@@ -211,6 +220,10 @@ class ApplicantsController extends Controller
      */
     public function destroy($id)
     {
+	    /*
+	     * Deletes an application
+	     *
+	     * */
         try{
 
 	        $applicant = Applicants::findorfail($id);

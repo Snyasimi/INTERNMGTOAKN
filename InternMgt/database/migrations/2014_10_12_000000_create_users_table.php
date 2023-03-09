@@ -23,7 +23,7 @@ return new class extends Migration
         $table->string('Position');
         $table->foreign('Position')->references('Position')->on('positions');
 
-        $table->bigInteger('Role');
+        $table->string('Role');
         $table->foreign('Role')->references('Role')->on('roles');
 
 	    $table->string('Supervisor')->nullable();

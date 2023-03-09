@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Events\AcceptedIntern;
 use App\Events\AssignedSupervisor;
+use App\Events\PasswordReset;
 use App\Models\Applicants;
 use App\Models\Position;
 use App\Models\Task;
@@ -32,13 +33,23 @@ class UsersController extends Controller
 
     public function index(Request $request)
     {
-        //Display Details depending on the role
+        /**
+         * This function returns the all users but the result is dependant on the Role of the user
+         * who made the request
+         * 
+         */
 
 	    if($request->user()->tokenCan('Admin'))
+        /**
+         * If an admin made the request the results are displayed as follows
+         */
 	    {
             switch ($request->path()){
 
                 case 'api/Admin/User/Dashboard' :
+                    /**
+                     * Results displayed are only the statistics 
+                     */
 
                     $data = [
                         'TotalUsers' => User::all()->count(),
@@ -50,6 +61,10 @@ class UsersController extends Controller
 
                 case 'api/Admin/User/Applicants' :
 
+                    /*
+                    *Results displayed are only the applicants 
+                    */
+
                     $data = [
                         'Applicants' => Applicants::where('ApplicationStatus','Processing')->get(),
                     ];
@@ -57,6 +72,9 @@ class UsersController extends Controller
                     return response()->json($data,200);
 
                 case 'api/Admin/User/Interviews' :
+                    /*
+                    *Interviews 
+                    */
 
                     $data = [
                         'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->get(),
@@ -65,6 +83,10 @@ class UsersController extends Controller
                     return response()->json($data,200);
 
                 case 'api/Admin/User/Supervisors' :
+                    /*
+                    *Supervisors 
+                    */
+
 
                     $data = [
                         'Supervisors' => User::where('Role',"SUP")->get(),
@@ -74,6 +96,9 @@ class UsersController extends Controller
                     break;
 
 		case 'api/Admin/User/Interns' :
+            /**
+             * When a request is made this route by an admin it returns all the interns 
+             */
 			$Interns = User::where('Role','INT')->get();
 
 			$CleanedInterns = $Interns->map(function($item)
@@ -92,9 +117,8 @@ class UsersController extends Controller
 			});
 
                     $data = [
-                        //TODO RETURN FILTER
-			    'Interns' => $CleanedInterns,
-                    
+
+                        'Interns' => $CleanedInterns,
                     ];
                     return response()->json($data,200);
 
@@ -162,20 +186,20 @@ class UsersController extends Controller
     public function create()
      {
         
-        $Supervisors = User::where('Role','SUP')->get();
-        $roles = Role::all();
-        $positions = Position::all();
+    //     $Supervisors = User::where('Role','SUP')->get();
+    //     $roles = Role::all();
+    //     $positions = Position::all();
 
-        $data = [
+    //     $data = [
             
-            'Supervisors' => $Supervisors,
-            'Roles' => $roles,
-            'Positions' => $positions
-        ];
+    //         'Supervisors' => $Supervisors,
+    //         'Roles' => $roles,
+    //         'Positions' => $positions
+    //     ];
 
-      //  return response()->json($data,200);
+    //   //  return response()->json($data,200);
 
-    return view('User.create',['position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
+    // return view('User.create',['position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
 
     }
 
@@ -187,6 +211,11 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
+        /**
+         * This function takes the request input and cleans it 
+         * if the details are ok the function adds a user in to the database but,
+         * only a user with admin privilages can add users directly
+         */
 
         $validate = $request->validate([
 	    	'Name' => ['required'],
@@ -206,8 +235,10 @@ class UsersController extends Controller
 
         $user->Supervisor = $request->input('Supervisor',null);
         $user->Status = true;
-        $user->password = Hash::make($request->input('password'));
+        $user->password = Hash::make($request->input('password',$user->PhoneNumber));
+        
         $user->save();
+        //PasswordReset::dispatch($user);
 
         return response()->json(["message" => "Successfully created"],201);
     }
@@ -220,6 +251,11 @@ class UsersController extends Controller
      */
     public function show($id)
     {
+        /* This function returns the details of the user by the id type-hinted on url
+        *If the user is a supervisor it returns The user object,task assigned and interns
+        *else it returns a user object {by id}
+        *If theres no such user it returns 404
+        */ 
         try{
             $user = User::findorfail($id);
 
@@ -259,9 +295,19 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
+        /* This function return the details that may need to be updated used by the api to fetch data
+         *returns user by ID and returns the list of supervisors
+        */
         try{
 		$user = User::findorfail($id);
+        
+        if(!$user->Supervisor == null)
+        {
+            $user['Supervisor'] = $user->supervisor->Name;
+        }
+     
 		$Supervisors = User::where('Role','SUP')->get();
+        
             $data = [
 		    'User' => $user,
 		    'Supervisors' => $Supervisors
@@ -285,6 +331,15 @@ class UsersController extends Controller
      */
     public function update(Request $request,$id)
     {
+        /* This function checks the user input in order to determine what to update on the user model
+         *If the user input has a supervisor id and InternId theun it updates the intern detail(Supervisor)
+         *and sends an email to the intern notifying him/her of the change
+         
+         
+         *Else if the request does not contain the ids it checks the role of the user who made the request
+         *if its an intern or supervisor who made the request it only updates the Name,Email,Phone number
+        *If the role is admin it udates the whole user object
+        */
 
 	if ($request->has(['SupervisorID','InternID']))
 	{
@@ -323,7 +378,6 @@ class UsersController extends Controller
 				'Name' => ['required'],
 				'Email' => ['required'],
 				'Position' => ['required'],
-				'Supervisor' => ['nullable'],
 				'PhoneNumber' => ['required']
 			]);
 
@@ -332,8 +386,9 @@ class UsersController extends Controller
 			$user->Name = $validate['Name'];
 			$user->Email = $validate['Email'];
 			$user->Position = $validate['Position'];
-			$user->Supervisor = $validate['Supervisor'];
 			$user->PhoneNumber = $validate['PhoneNumber'];
+
+            
 			$user->save();
 
          	return response()->json(['Message' => 'ok'],200);
@@ -374,6 +429,7 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
+        /* Deletes a user based on User_ID*/
         try{
             $user = User::findorfail($id);
             $user->delete();
