@@ -47,4 +47,10 @@ return new class extends Migration
     {
         Schema::dropIfExists('users');
     }
+
+    public function before()
+    {
+        $this->before =   "2023_02_15_161820_create_positions_table.php";
+        $this->before =   "2023_02_15_165514_create_roles_table.php";
+    }
 };
