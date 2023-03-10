@@ -14,7 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('tasks', function (Blueprint $table) {
-            $table->id();
+		$table->id();
+		$table->index('id');
             $table->foreignUlid('AssignedBy')->references('user_id')->on('users');
             $table->foreignUlid('AssignedTo')->references('user_id')->on('users');
             $table->string('Task');

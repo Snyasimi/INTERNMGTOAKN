@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('comment_and_remarks', function (Blueprint $table) {
             $table->id();
 
-            $table->bigInteger('task_id');
+            $table->unsignedBigInteger('task_id');
+
             $table->foreign('task_id')->references('id')->on('tasks');
 
             $table->string("Comments");
