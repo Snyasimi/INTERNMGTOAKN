@@ -16,7 +16,7 @@ class CommentController extends Controller
     public function index($id)
     {
 	    $comments = CommentAndRemark::where('user_id',Auth::user()->user_id)
-                            ->where('task_id',$id)->get();
+                            ->where('task_id',$id)->lazy();
 
 	    $data = ['comments' => $comments];
 	    return response()->json($data,200);
@@ -41,18 +41,18 @@ class CommentController extends Controller
     public function store(Request $request)
     {
 	    $validate = $request->validate([
+		    
 		    'Intern_comment' => ['required'],
 		    'Userid' => ['required']
-		    ]);
+	    ]);
+	    
 	    $id = $request->input('Taskid');
-
-        $Task = Task::findorfail($id);
+	    $Task = Task::findorfail($id);
 	    $remark = new CommentAndRemark;
-	    // $remark->task_id = $request->input('Taskid');
 	    $remark->Comments = $validate['Intern_comment'];
 	    $remark->user_id = $validate['Userid'];
 
-        $Task->comments()->save($remark);
+	    $Task->comments()->save($remark);
  		
 	    return response()->json(['message' => 'Comment Added'],200);
     }
@@ -90,9 +90,10 @@ class CommentController extends Controller
     {
 	    $validate = $request->validate([
 	    	'Comment' => ['required']
+	    
 	    ]);
+	    
 	    $comment = CommentAndRemark::findorfail($id);
-
 	    $comment->Comments = $validate['Comment'];
 	    $comment->save();
 

@@ -7,7 +7,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Arr;
 use App\Events\TaskAssigned;
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,14 +31,21 @@ class TaskController extends Controller
 
         if($user->Role == "SUP"){
 
-		$tasks = Task::where('AssignedBy',$user->user_id)->get();
-		$arrTask = [];
-		foreach($tasks as $task)
-		{
-            $task[$task->Assignedto->Name];
-            $arrTask[] = $task;
+		$tasks = Task::where('AssignedBy',$user->user_id)->lazy();
+		//$arrTask = [];
+		//foreach($tasks as $task)
+		//{
+		//	$task[$task->Assignedto->Name];
+		//	$arrTask[] = $task;
             
-		}
+		//}
+		$arrTask = $tasks->map(function($Task)
+		{
+			$Task->assignedto = $Task->Assignedto->Name;
+			unset($Task['AssignedTo']);
+			return $Task;
+		});
+
              $data = [
                 'Tasks' => $arrTask
              ];
@@ -47,7 +54,7 @@ class TaskController extends Controller
             }
             else{
 
-                    $tasks = Task::where('AssignedTo',$user->user_id)->get();
+                    $tasks = Task::where('AssignedTo',$user->user_id)->lazy();
                      $data = [
                         'Tasks' => $tasks
 
@@ -71,7 +78,7 @@ class TaskController extends Controller
         //     "message" => "Dispalying interns"
         // ];
         // return response()->json($data,200);
-            $int = User::where('Role','INT')->get();
+            $int = User::where('Role','INT')->lazy();
         return view('Task.create',['Interns'=> $int]);
     }
 
@@ -90,26 +97,29 @@ class TaskController extends Controller
 	    	'AssignedTo' => ['required'],
             'Task' => ['required'],
             'TaskDescription' => ['required'],
-            'Deadline' => ['required']
+            'Deadline' => ['required','date']
 	]);
 
+	
 	$intern = User::findorfail($validate['AssignedTo']); 
         $Supervisor = Auth::user();
-	    $Task = new Task;
-	    $Task->AssignedTo = $validate['AssignedTo'];
-	    $Task->Task = $request->input('Task');
+	
+	$Task = new Task;
+	$Task->AssignedTo = $validate['AssignedTo'];
+    	$Task->Task = $request->input('Task');
         $Task->Description = $request->input('TaskDescription');
-	    $Task->Deadline = $request->date('Deadline');
-        //ADD DESCRIPTION
-	    $Task->Status = "Assigned";
-	    $Supervisor->Assign()->save($Task);
+	$Task->Deadline = Carbon::parse($request->date('Deadline'))->format('d/m/y');
+	$Task->Status = "Assigned";
+	$Supervisor->Assign()->save($Task);
         
-	    TaskAssigned::dispatch($intern->Email,$validate['TaskDescription']);
+	TaskAssigned::dispatch($intern->Email,$validate['TaskDescription']);
 
-        $data = [
-            "message" => 'Task assigned'
-        ];
-        return response()->json($data, 201);
+
+	$data = [
+    		"message" => 'Task assigned'
+    	];
+    
+	return response()->json($data, 201);
 
     }
 
@@ -122,23 +132,29 @@ class TaskController extends Controller
     public function show($id)
     {
         try{
-        $task= Task::findOrfail($id);
+		$task= Task::findOrfail($id);
          
-        //$comments = $task->comments()->first();
-        //CHANGE THE FILTER CONDITION TO BE THE AUTHENTICATED USER
-        $comments = CommentAndRemark::where('user_id',Auth::user())->
-                                    where('task_id',$task->id)->get();
-        $data = [
-        'task' => $task,
-	    'Supervisor' => $task->Assignedby->Name,
-	    'remarks' => CommentAndRemark::where('user_id',$task->Assignedby->user_id)->where('task_id',$task->id)->get(),
-	    'comment' => CommentAndRemark::where('user_id',$task->Assignedto->user_id)->where('task_id',$task->id)->get() 
-        ];
-        return response()->json($data,200);
-    }
-    catch(ModelNotFoundException){
-        return response()->json(['message' => 'Task Not found'],404);
-    }
+		$comments = CommentAndRemark::where('user_id',Auth::user())->
+    			where('task_id',$task->id)->lazy();
+	    
+		$data = [
+			
+			'task' => $task,
+			'Supervisor' => $task->Assignedby->Name,
+			'remarks' => CommentAndRemark::where('user_id',$task->Assignedby->user_id)->where('task_id',$task->id)->lazy(),
+			'comment' => CommentAndRemark::where('user_id',$task->Assignedto->user_id)->where('task_id',$task->id)->lazy() 
+		];
+		
+		return response()->json($data,200);
+	
+	}
+	
+	catch(ModelNotFoundException)
+	{	
+		return response()->json(['message' => 'Task Not found'],404);
+	
+	}
+    
     }
 
     /**
@@ -151,14 +167,21 @@ class TaskController extends Controller
     {
         //RETURN ONLY THE BODY AND THE ASSIGNED TO
         try{
-            $data = ['task' => Task::findorfail($id),
-                'message' => 'view task'
-            ];
-            return response()->json($data, 200);
+		
+		$data = [
+			'task' => Task::findorfail($id),	
+			'message' => 'view task'
+		];
+		
+		return response()->json($data, 200);
+	
+	}
+	
+	catch(ModelNotFoundException)
+	{
+	    	return response()->json(['message' => 'task not found'],404);
         }
-        catch(ModelNotFoundException){
-            return response()->json(['message' => 'task not found'],404);
-        }
+    
     }
 
     /**
@@ -170,18 +193,21 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validate = $request->validate([
-            'Task' => ['required'],
-            'Description' => ['required'],
-            'Deadline' => ['required']
-        ]);
-        $Task = Task::findorfail($id);
-
-        $Task->Task = $validate['Task'];
-        $Task->Description = $validate['Description'];
-        $Task->Deadline = $validate['Deadline'];
-        $Task->save();
-        return response()->json(["msg" => "ok"],200);
+	   
+	    $validate = $request->validate([
+		    'Task' => ['required'],
+		    'Description' => ['required'],
+		    'Deadline' => ['required']
+	    
+	    ]);
+	    
+	    $Task = Task::findorfail($id);
+	    $Task->Task = $validate['Task'];
+	    $Task->Description = $validate['Description'];
+	    $Task->Deadline = Carbon::parse($validate['Deadline'])->format('d/m/y');
+	    $Task->save();
+	    
+	    return response()->json(["msg" => "ok"],200);
 
     }
 
@@ -190,33 +216,39 @@ class TaskController extends Controller
 
 	    try{
 
-            $task = Task::findorfail($id);
-            $validate = $request->validate(['Status' => ['reqiured']]);
+		    $task = Task::findorfail($id);
+		    
+		    $validate = $request->validate(['Status' => ['reqiured']]);
     
-            if($task->Status == 'Assigned')
-            {
-                $task->Status = "Completed";
-                $task->save();
+		   
+		    if($task->Status == 'Assigned')
+		    {
+			    $task->Status = "Completed";
+			    $task->save();
+			    
+			    return response()->json(["message" => "Updated"],200);
+		    }
+		    
+		    else
+		    {
+			    $task->Status = "Assigned";
+			    
+			    $task->save();
     
-                return response()->json(["message" => "Updated"],200);
-            }
-            else
-            {
-                $task->Status = "Assigned";
-                $task->save();
-    
-                return response()->json(["message" => "Updated"],200);
-            }
+			    return response()->json(["message" => "Updated"],200);
+		    }
                  
-    
-                }
+	    }
     
             
-            catch(ModelNotFoundException){
-    
-                return response()->json(['message' => 'No such task'],404);
-            }
+	    catch(ModelNotFoundException)
+	    {
 
+		    return response()->json(['message' => 'No such task'],404);
+	    
+	    }
+
+    
     }
 
 
@@ -229,15 +261,23 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        try{
+	    try
+	    {
 
-            $task = Task::findorfail($id);
-            $task->delete();
-            return response()->json(["message" => 'Task deleted'],410);
+		    $task = Task::findorfail($id);
+		    $task->delete();
+		    
+		    return response()->json(["message" => 'Task deleted'],410);
 
-        }
-        catch(ModelNotFoundException){
-            return response()->json(["message" => 'Task does not exist'],404);
-        }
+	    
+	    }
+	    
+	    catch(ModelNotFoundException)
+	    {
+		    
+		    return response()->json(["message" => 'Task does not exist'],404);
+	    
+	    }
     }
+
 }

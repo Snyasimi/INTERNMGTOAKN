@@ -20,12 +20,14 @@ class ApplicantsController extends Controller
     public function index()
     {
         //SHOW ALL APPLICANTS
-        $Applicants = Applicants::all();
+        $Applicants = Applicants::lazy();
 
          $data =[
-            "Applicants" => $Applicants,
-            "message" => 'Displaying applicants'
-         ];
+		 
+		 "Applicants" => $Applicants,
+		 "message" => 'Displaying applicants'
+	 ];
+	
 	return response()->json($data, 200);
     }
 
@@ -36,7 +38,7 @@ class ApplicantsController extends Controller
      */
     public function create()
     {
-        $positions = Position::all();
+        $positions = Position::lazy();
 
          $data =[
              'positions' => $positions
@@ -52,6 +54,10 @@ class ApplicantsController extends Controller
      */
 
     public function store(Request $request)
+	    /*
+	     * Save user to database 
+	     * 
+	     * */
     {
 	     $validate = $request->validate([
 	    	'Name' => ['required'],
@@ -64,19 +70,24 @@ class ApplicantsController extends Controller
 	    ]);
 
 
-	 $url_to_cv = $request->file('Cv')->store('public');
-         $url_to_attachment_letter = $request->file('AttachmentLetter')->store('public');
+	    
+	     $url_to_cv = $request->file('Cv')->store('public');
+	     $url_to_attachment_letter = $request->file('AttachmentLetter')->store('public');
          
 
 	   $applicant = Applicants::create([
-	    'Name' => $request->input('Name'),
-		'Email' => $request->input('Email'),
-		'PhoneNumber' => $request->input('PhoneNumber'),
-		'Position' => $request->input('Position'),
-		'url_to_cv_file' => $url_to_cv,
-        'url_to_attachment_letter' => $url_to_attachment_letter,
-        'ApplicationStatus' => 'Processing'
+		   'Name' => $request->input('Name'),
+		   'Email' => $request->input('Email'),
+		   'PhoneNumber' => $request->input('PhoneNumber'),
+		   'Position' => $request->input('Position'),
+
+		   
+		   'url_to_cv_file' => $url_to_cv,	
+		   'url_to_attachment_letter' => $url_to_attachment_letter,
+	
+		   'ApplicationStatus' => 'Processing'
         
+	   
 	   ]);
 
 	    return response()->json(["message" => "Created"], 200);

@@ -66,7 +66,7 @@ class UsersController extends Controller
                     */
 
                     $data = [
-                        'Applicants' => Applicants::where('ApplicationStatus','Processing')->get(),
+                        'Applicants' => Applicants::where('ApplicationStatus','Processing')->lazy(),
                     ];
 
                     return response()->json($data,200);
@@ -77,7 +77,7 @@ class UsersController extends Controller
                     */
 
                     $data = [
-                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->get(),
+                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->lazy(),
                     ];
     
                     return response()->json($data,200);
@@ -89,7 +89,7 @@ class UsersController extends Controller
 
 
                     $data = [
-                        'Supervisors' => User::where('Role',"SUP")->get(),
+                        'Supervisors' => User::where('Role',"SUP")->lazy(),
                     ];
                     return response()->json($data,200);
 
@@ -99,7 +99,7 @@ class UsersController extends Controller
             /**
              * When a request is made this route by an admin it returns all the interns 
              */
-			$Interns = User::where('Role','INT')->get();
+			$Interns = User::where('Role','INT')->orderBy('Name')->lazy();
 
 			$CleanedInterns = $Interns->map(function($item)
 			{
@@ -143,7 +143,7 @@ class UsersController extends Controller
                 case 'api/Supervisor/User/AssignedTasks' :
 
                     $data = [
-                        'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->get(),
+                        'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->lazy(),
                     ];
                     return response()->json($data,200);
 
@@ -152,7 +152,7 @@ class UsersController extends Controller
                 case 'api/Supervisor/User/MyInterns' :
 
                     $data =[
-                        'MyInterns' => User::where('Supervisor',$request->user()->user_id)->get(),
+                        'MyInterns' => User::where('Supervisor',$request->user()->user_id)->lazy(),
                         
                     ];
 
@@ -218,20 +218,21 @@ class UsersController extends Controller
          */
 
         $validate = $request->validate([
-	    	'Name' => ['required'],
-		    'Email' => ['required','unique:applicants,users'],
-		    'PhoneNumber' =>['min_digits:8'],
-		    'Position' => ['required'],
-		    'Role' => ['required'],
+		
+		'Name' => ['required'],
+		'Email' => ['required','unique:applicants,users'],
+	    	'PhoneNumber' =>['min_digits:8'],
+   		'Position' => ['required'],
+		'Role' => ['required'],
+	]);
 
-	    ]);
 
         $user = new User;
-        $user->Name = $request->input('Name');
-        $user->Email = $request->input('Email');
-        $user->PhoneNumber = $request->input('PhoneNumber');
-	    $user->Position = $request->input('Position');
-	    $user->Role = $request->input('Role');
+        $user->Name = $validate['Name'];//$request->input('Name');
+        $user->Email = $validate['Email'];//$request->input('Email');
+        $user->PhoneNumber = $validate['PhoneNumber'];//$request->input('PhoneNumber');
+	    $user->Position = $validate['Position'];//$request->input('Position');
+	    $user->Role = $validate['Role'];//$request->input('Role');
 
         $user->Supervisor = $request->input('Supervisor',null);
         $user->Status = true;
@@ -263,8 +264,8 @@ class UsersController extends Controller
 
                 $data =[
                    'User' => $user,
-                   "Interns" => User::where('Supervisor',$user->user_id)->get(),
-                   "Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->get()
+                   "Interns" => User::where('Supervisor',$user->user_id)->lazy(),
+                   "Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->lazy()
                 ];
                 return response()->json($data,200);
             }
@@ -295,31 +296,32 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        /* This function return the details that may need to be updated used by the api to fetch data
-         *returns user by ID and returns the list of supervisors
+	    /* This function return the details that may need to be updated,
+	     * It is used by the api to GET data that may need to be updated
+	     * It returns the User and Supervisors
         */
         try{
 		$user = User::findorfail($id);
         
-        if(!$user->Supervisor == null)
-        {
-            $user['Supervisor'] = $user->supervisor->Name;
-        }
+		if(!$user->Supervisor == null)
+		{
+			$user['Supervisor'] = $user->supervisor->Name;
+		}
      
 		$Supervisors = User::where('Role','SUP')->get();
         
-            $data = [
-		    'User' => $user,
-		    'Supervisors' => $Supervisors
-            ];
+		$data = [
+			'User' => $user,
+			'Supervisors' => $Supervisors
+		];
 
-            return response()->json($data,200);
-        }
-        catch(ModelNotFoundException){
-             return response()->json([
-                'message' => 'No such user'
-             ],404);
-        }
+		return response()->json($data,200);
+	}
+	
+	catch(ModelNotFoundException){
+		
+		return response()->json(['message' => 'No such user'],404);
+	}
     }
 
     /**
@@ -353,7 +355,7 @@ class UsersController extends Controller
 		
 		
 		User::where('user_id',$validate['InternID'])
-			
+
 			->update(['Supervisor' => $validate['SupervisorID']]);
 		
 		$Supervisor = User::findorfail($validate['SupervisorID']);
