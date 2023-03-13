@@ -13,30 +13,36 @@ return new class extends Migration
      */
     public function up()
     {
-	    Schema::disableForeignKeyConstraints()
+	    Schema::disableForeignKeyConstraints();
         Schema::create('users', function (Blueprint $table) {
 
 		$table->ulid('user_id')->primary();
 		$table->index('user_id');
-        $table->string('Name');
-	    $table->string('Email')->unique();
-	    $table->integer('PhoneNumber');
+	
+		$table->string('Name');
+		$table->string('Email')->unique();	
+		$table->integer('PhoneNumber');
 
-        $table->string('Position');
-        $table->foreign('Position')->references('Position')->on('positions');
+		
+		$table->string('Position');
+		$table->foreign('Position')->references('Position')->on('positions');
 
-        $table->string('Role');
-        $table->foreign('Role')->references('Role')->on('roles');
+		
+		$table->string('Role');
+		$table->foreign('Role')->references('Role')->on('roles');
 
-	$table->foreignUlid('Supervisor')->references('user_id')->on('users');
+		$table->string('Supervisor')->nullable();
+		$table->foreign('Supervisor')->references('user_id')->on('users')->onDelete('set null');
 
-	$table->boolean('Status');
+		$table->boolean('Status');
 
-	    //$table->timestamp('email_verified_at')->nullable();
-        $table->string('password')->nullable();
-        //$table->rememberToken();
-        $table->timestamps();
+		
+		$table->string('password')->nullable();
+		//$table->rememberToken();
+		$table->timestamps();
+	
 	});
+	
 	    Schema::enableForeignKeyConstraints();
     }
 
