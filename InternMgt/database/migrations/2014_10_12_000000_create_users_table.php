@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
 	    Schema::disableForeignKeyConstraints();
-        Schema::create('users', function (Blueprint $table) {
+	    Schema::create('users', function (Blueprint $table) {
 
 		$table->ulid('user_id')->primary();
 		$table->index('user_id');
