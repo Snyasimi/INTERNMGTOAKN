@@ -186,11 +186,11 @@ class UsersController extends Controller
     public function create()
      {
         
-    //     $Supervisors = User::where('Role','SUP')->get();
-    //     $roles = Role::all();
-    //     $positions = Position::all();
+         $Supervisors = User::where('Role','SUP')->get();
+         $roles = Role::all();
+         $positions = Position::all();
 
-    //     $data = [
+    //    $data = [
             
     //         'Supervisors' => $Supervisors,
     //         'Roles' => $roles,
@@ -199,7 +199,7 @@ class UsersController extends Controller
 
     //   //  return response()->json($data,200);
 
-    // return view('User.create',['position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
+     return view('User.create',['position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
 
     }
 
@@ -220,7 +220,7 @@ class UsersController extends Controller
         $validate = $request->validate([
 		
 		'Name' => ['required'],
-		'Email' => ['required','unique:applicants,users'],
+		'Email' => ['required'],
 	    	'PhoneNumber' =>['min_digits:8'],
    		'Position' => ['required'],
 		'Role' => ['required'],
