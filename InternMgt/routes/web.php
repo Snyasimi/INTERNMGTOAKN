@@ -21,7 +21,7 @@ use App\Http\Controllers\{RolesController,
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('Mail.PassedInterview');
 });
 Route::get("Account/Signin",[AccountActivator::class,'active'])->name('Setpassword');
 
