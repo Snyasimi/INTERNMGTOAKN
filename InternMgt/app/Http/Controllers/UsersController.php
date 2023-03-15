@@ -54,8 +54,9 @@ class UsersController extends Controller
                     $data = [
                         'TotalUsers' => User::all()->count(),
                         'TotalSupervisors' => User::where('Role',"SUP")->count(),
-                        'TotalInterns' => User::where('Role',"INT")->count(),
-                        'TotalApplicants' => Applicants::all()->count(),
+			'TotalInterns' => User::where('Role',"INT")->count(),
+			'SelectedApplicants' => Applicants::whereNot('ApplicationStatus','Processing')->count(),
+                        'TotalApplicants' => Applicants::where('ApplicationStatus','Processing')->count(),
                     ];
                     return response()->json($data,200);
 
@@ -66,7 +67,7 @@ class UsersController extends Controller
                     */
 
                     $data = [
-                        'Applicants' => Applicants::where('ApplicationStatus','Processing')->lazy(),
+                        'Applicants' => Applicants::where('ApplicationStatus','Processing')->orderBy('Name')->lazy(),
                     ];
 
                     return response()->json($data,200);
@@ -77,7 +78,7 @@ class UsersController extends Controller
                     */
 
                     $data = [
-                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->lazy(),
+                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->orderBy('Name')->lazy(),
                     ];
     
                     return response()->json($data,200);
@@ -89,7 +90,7 @@ class UsersController extends Controller
 
 
                     $data = [
-                        'Supervisors' => User::where('Role',"SUP")->lazy(),
+                        'Supervisors' => User::where('Role',"SUP")->orderBy('Name')->lazy(),
                     ];
                     return response()->json($data,200);
 
@@ -143,7 +144,7 @@ class UsersController extends Controller
                 case 'api/Supervisor/User/AssignedTasks' :
 
                     $data = [
-                        'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->lazy(),
+                        'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->orderBy('Name')->lazy(),
                     ];
                     return response()->json($data,200);
 
@@ -152,7 +153,7 @@ class UsersController extends Controller
                 case 'api/Supervisor/User/MyInterns' :
 
                     $data =[
-                        'MyInterns' => User::where('Supervisor',$request->user()->user_id)->lazy(),
+                        'MyInterns' => User::where('Supervisor',$request->user()->user_id)->orderBy('Name')->lazy(),
                         
                     ];
 
