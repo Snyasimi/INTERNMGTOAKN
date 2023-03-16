@@ -16,14 +16,12 @@ return new class extends Migration
         Schema::create('comment_and_remarks', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('task_id');
-
-            $table->foreign('task_id')->references('id')->on('tasks');
+            $table->unsignedBigInteger('task_id')->nullable();
+            $table->foreign('task_id')->references('id')->on('tasks')->onDelete('set null');
 
             $table->string("Comments");
 
-            //$table->bigInteger('user_id');
-            $table->foreignUlid('user_id')->references('user_id')->on('users');
+            $table->foreignUlid('user_id')->nullable()->references('user_id')->on('users')->onDelete('set null');
 
             $table->timestamps();
         });

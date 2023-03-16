@@ -1,9 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Events\AcceptedIntern;
-use App\Events\AssignedSupervisor;
-use App\Events\PasswordReset;
+use App\Events\{AcceptedIntern,PasswordReset,AssignedSupervisor,CreatedSupervisor};
 use App\Models\Applicants;
 use App\Models\Position;
 use App\Models\Task;
@@ -78,7 +76,7 @@ class UsersController extends Controller
                     */
 
                     $data = [
-                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->orderBy('Name')->lazy(),
+                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->orderBy('created_at','desc')->lazy(),
                     ];
     
                     return response()->json($data,200);
@@ -237,10 +235,11 @@ class UsersController extends Controller
 
         $user->Supervisor = $request->input('Supervisor',null);
         $user->Status = true;
-        $user->password = Hash::make($request->input('password',$user->PhoneNumber));
-        
+	$user->password = Hash::make($request->input('password',$user->PhoneNumber));
+
+        CreatedSupervisor::dispatch($user->Email);
         $user->save();
-        //PasswordReset::dispatch($user);
+        
 
         return response()->json(["message" => "Successfully created"],201);
     }
@@ -265,8 +264,8 @@ class UsersController extends Controller
 
                 $data =[
                    'User' => $user,
-                   "Interns" => User::where('Supervisor',$user->user_id)->lazy(),
-                   "Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->lazy()
+                   "Interns" => User::where('Supervisor',$user->user_id)->orderBy('created_at')->lazy(),
+                   "Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->orderBy('created_at')->lazy()
                 ];
                 return response()->json($data,200);
             }

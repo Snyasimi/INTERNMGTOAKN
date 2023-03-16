@@ -24,11 +24,11 @@ return new class extends Migration
 		$table->integer('PhoneNumber');
 
 		
-		$table->string('Position');
+		$table->string('Position')->nullable();
 		$table->foreign('Position')->references('Position')->on('positions');
 
 		
-		$table->string('Role');
+		$table->string('Role')->nullable();
 		$table->foreign('Role')->references('Role')->on('roles');
 
 		$table->string('Supervisor')->nullable();
