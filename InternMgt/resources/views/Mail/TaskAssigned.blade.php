@@ -1,3 +1,11 @@
-New Task assigned 
+@extends('Mail.layout.layout')
 
-You're Task is to {{ $Task }}
+@section('content')
+
+
+	<p>New Task assigned</p> 
+
+	<p>You're Task is to {{ $Task }}</p>
+
+
+@endsection('content')

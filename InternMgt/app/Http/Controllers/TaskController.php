@@ -32,13 +32,7 @@ class TaskController extends Controller
         if($user->Role == "SUP"){
 
 		$tasks = Task::where('AssignedBy',$user->user_id)->lazy();
-		//$arrTask = [];
-		//foreach($tasks as $task)
-		//{
-		//	$task[$task->Assignedto->Name];
-		//	$arrTask[] = $task;
-            
-		//}
+		
 		$arrTask = $tasks->map(function($Task)
 		{
 			$Task->assignedto = $Task->Assignedto->Name;
@@ -109,8 +103,11 @@ class TaskController extends Controller
     	$Task->Task = $request->input('Task');
         $Task->Description = $request->input('TaskDescription');
 	$Task->Deadline = Carbon::parse($request->date('Deadline'))->format('d/m/y');
+
 	$Task->Status = "Assigned";
-	$Supervisor->Assign()->save($Task);
+	
+       $Supervisor->Assign()->save($Task);
+	
         
 	TaskAssigned::dispatch($intern->Email,$validate['TaskDescription']);
 

@@ -220,7 +220,7 @@ class UsersController extends Controller
 		
 		'Name' => ['required'],
 		'Email' => ['required'],
-	    	'PhoneNumber' =>['min_digits:8'],
+	    	'PhoneNumber' =>['required'],
    		'Position' => ['required'],
 		'Role' => ['required'],
 	]);
