@@ -95,85 +95,97 @@ class UsersController extends Controller
                     break;
 
 		case 'api/Admin/User/Interns' :
-            /**
-             * When a request is made this route by an admin it returns all the interns 
-             */
+			/**
+			 * When a request is made this route by an admin it returns all the interns 
+			 */
+
 			$Interns = User::where('Role','INT')->orderBy('Name')->lazy();
 
 			$CleanedInterns = $Interns->map(function($item)
 			{
-                
-            
-                if(!$item->Supervisor == null)
-                {
-                    $item->supervisor = $item->supervisor->Name;
-                    unset($item['Supervisor']);
-                    return $item;
-                }
-                else
-                return $item;
+				if(!$item->Supervisor == null)
+				{
+					$item->supervisor = $item->supervisor->Name;
+					unset($item['Supervisor']);
+					return $item;
+				}
+				else
+					return $item;
 				
+			
 			});
+			
+			$data = [
 
-                    $data = [
+				'Interns' => $CleanedInterns,
+			
+			];
+			
+			return response()->json($data,200);
 
-                        'Interns' => $CleanedInterns,
-                    ];
-                    return response()->json($data,200);
+			break;
 
-                    break;
-
-                default :
-                    return response()->json(["Message" => "No such route"],400);
-
-                    break;
-
+		default :
+			
+			return response()->json(["Message" => "No such route"],400);
 
 
-
-            }
+	    
+	    }
 
 	    }
 
-        else if($request->user()->tokenCan('Supervisor')){
+	    
+	    else if($request->user()->tokenCan('Supervisor')){
 
-            switch ($request->path()){
+		    
+		    switch ($request->path()){
 
-                case 'api/Supervisor/User/AssignedTasks' :
+		    
+		    case 'api/Supervisor/User/AssignedTasks' :
+	
+			    $data = [
+		    
+				    'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->orderBy('Name')->lazy(),
+			
+			    ];
+			    
+			    return response()->json($data,200);
 
-                    $data = [
-                        'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->orderBy('Name')->lazy(),
-                    ];
-                    return response()->json($data,200);
+    
+		    case 'api/Supervisor/User/MyInterns' :
 
-                    break ;
+			    $data =[
+		    
+				    'MyInterns' => User::where('Supervisor',$request->user()->user_id)->orderBy('Name')->lazy(),       
+			    ];
+	    
+			    return response()->json($data,200);
+                 
 
-                case 'api/Supervisor/User/MyInterns' :
+		    default:
 
-                    $data =[
-                        'MyInterns' => User::where('Supervisor',$request->user()->user_id)->orderBy('Name')->lazy(),
-                        
-                    ];
+			    $data = [
+	    
+				    'user' => User::findorfail($request->user()->user_id)
+		
+			    ];
+			
+			    return response()->json($data,200);
 
-                    return response()->json($data,200);
+		    
+		    }
 
-                    break ;
+	    
+	    }
 
-                default:
-
-                   $data = [
-                        'user' => User::findorfail($request->user()->user_id)
-                    ];
-                    return response()->json($data,200);
-
-            }
-
-        }
-
-        else
-        {
-            return response()->json(["user" => $request->user()],200);
-        }
+	    
+	    else
+	    {
+		    
+		    return response()->json(["user" => $request->user()],200);
+	    }
+    
     }
 
 
