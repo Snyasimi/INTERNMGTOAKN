@@ -131,15 +131,21 @@ class TaskController extends Controller
         try{
 		$task= Task::findOrfail($id);
          
-		$comments = CommentAndRemark::where('user_id',Auth::user())->
-    			where('task_id',$task->id)->lazy();
+		$Comments =  CommentAndRemark::where('task_id',$task->id)->orderBy('created_at')->lazy();
+		$CleanedComments =  $Comments->map(function($cmts)
+		{
+			$cmts->madeby = $cmts->MadeBy->Name;
+			unset($cmts['made_by']);
+			return $cmts;
+			
+		});	
 	    
 		$data = [
 			
 			'task' => $task,
 			'Supervisor' => $task->Assignedby->Name,
-			'remarks' => CommentAndRemark::where('user_id',$task->Assignedby->user_id)->where('task_id',$task->id)->lazy(),
-			'comment' => CommentAndRemark::where('user_id',$task->Assignedto->user_id)->where('task_id',$task->id)->lazy() 
+			'remarks' => ['lalala'],
+			'comment' => $CleanedComments
 		];
 		
 		return response()->json($data,200);
