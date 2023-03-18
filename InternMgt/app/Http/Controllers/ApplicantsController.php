@@ -62,7 +62,7 @@ class ApplicantsController extends Controller
 	     $validate = $request->validate([
 	    	'Name' => ['required'],
 		    'Email' => ['required'],
-		    'PhoneNumber' =>['min_digits:8'],
+		    'PhoneNumber' =>['required'],
 		    'Position' => ['required'],
 		    //'Cv'=>['required','file'],
             //'AttachmentLetter' => ['required','file']

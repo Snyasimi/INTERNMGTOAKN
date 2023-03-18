@@ -32,13 +32,7 @@ class TaskController extends Controller
         if($user->Role == "SUP"){
 
 		$tasks = Task::where('AssignedBy',$user->user_id)->lazy();
-		//$arrTask = [];
-		//foreach($tasks as $task)
-		//{
-		//	$task[$task->Assignedto->Name];
-		//	$arrTask[] = $task;
-            
-		//}
+		
 		$arrTask = $tasks->map(function($Task)
 		{
 			$Task->assignedto = $Task->Assignedto->Name;
@@ -109,8 +103,11 @@ class TaskController extends Controller
     	$Task->Task = $request->input('Task');
         $Task->Description = $request->input('TaskDescription');
 	$Task->Deadline = Carbon::parse($request->date('Deadline'))->format('d/m/y');
+
 	$Task->Status = "Assigned";
-	$Supervisor->Assign()->save($Task);
+	
+       $Supervisor->Assign()->save($Task);
+	
         
 	TaskAssigned::dispatch($intern->Email,$validate['TaskDescription']);
 
@@ -134,15 +131,21 @@ class TaskController extends Controller
         try{
 		$task= Task::findOrfail($id);
          
-		$comments = CommentAndRemark::where('user_id',Auth::user())->
-    			where('task_id',$task->id)->lazy();
+		$Comments =  CommentAndRemark::where('task_id',$task->id)->orderBy('created_at')->lazy();
+		$CleanedComments =  $Comments->map(function($cmts)
+		{
+			$cmts->madeby = $cmts->MadeBy->Name;
+			unset($cmts['made_by']);
+			return $cmts;
+			
+		});	
 	    
 		$data = [
 			
 			'task' => $task,
 			'Supervisor' => $task->Assignedby->Name,
-			'remarks' => CommentAndRemark::where('user_id',$task->Assignedby->user_id)->where('task_id',$task->id)->lazy(),
-			'comment' => CommentAndRemark::where('user_id',$task->Assignedto->user_id)->where('task_id',$task->id)->lazy() 
+			'remarks' => ['lalala'],
+			'comment' => $CleanedComments
 		];
 		
 		return response()->json($data,200);

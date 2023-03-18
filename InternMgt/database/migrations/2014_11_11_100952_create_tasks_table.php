@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
 		$table->id();
 		$table->index('id');
-            $table->foreignUlid('AssignedBy')->references('user_id')->on('users');
-            $table->foreignUlid('AssignedTo')->references('user_id')->on('users');
+            $table->foreignUlid('AssignedBy')->nullable()->references('user_id')->on('users')->onDelete('set null');
+            $table->foreignUlid('AssignedTo')->nullable()->references('user_id')->on('users')->onDelete('set null');
             $table->string('Task');
             $table->string('Description');
             $table->date('Deadline');

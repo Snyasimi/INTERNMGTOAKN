@@ -24,12 +24,12 @@ return new class extends Migration
 		$table->integer('PhoneNumber');
 
 		
-		$table->string('Position');
-		$table->foreign('Position')->references('Position')->on('positions');
+		$table->string('Position')->nullable();
+		$table->foreign('Position')->references('Position')->on('positions')->onDelete('set null');
 
 		
-		$table->string('Role');
-		$table->foreign('Role')->references('Role')->on('roles');
+		$table->string('Role')->nullable();
+		$table->foreign('Role')->references('Role')->on('roles')->onDelete('set null');
 
 		$table->string('Supervisor')->nullable();
 		$table->foreign('Supervisor')->references('user_id')->on('users')->onDelete('set null');

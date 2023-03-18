@@ -35,7 +35,7 @@ Route::post('ForgotPassword',[AccountActivator::class,'ForgotPassword'])->name('
 
 Route::post("Account/Activate",[AccountActivator::class,'Activate'])->name('ActivateAccount');
 Route::get("Account/Sign-in",[AccountActivator::class,'active'])->name('Setpassword');
-Route::delete('Account/Deactivate/{id}',[AccountActivator::class,'Deactivate'])->name('DeactivateAccount');
+Route::get('Account/Deactivate/{id}',[AccountActivator::class,'Deactivate'])->name('DeactivateAccount');
 Route::resource('Position',PositionController::class);
 
 // PROTECTED ROUTES

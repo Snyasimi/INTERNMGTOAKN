@@ -1,9 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Events\AcceptedIntern;
-use App\Events\AssignedSupervisor;
-use App\Events\PasswordReset;
+use App\Events\{AcceptedIntern,PasswordReset,AssignedSupervisor,CreatedSupervisor};
 use App\Models\Applicants;
 use App\Models\Position;
 use App\Models\Task;
@@ -54,8 +52,9 @@ class UsersController extends Controller
                     $data = [
                         'TotalUsers' => User::all()->count(),
                         'TotalSupervisors' => User::where('Role',"SUP")->count(),
-                        'TotalInterns' => User::where('Role',"INT")->count(),
-                        'TotalApplicants' => Applicants::all()->count(),
+			'TotalInterns' => User::where('Role',"INT")->count(),
+			'SelectedApplicants' => Applicants::whereNot('ApplicationStatus','Processing')->count(),
+                        'TotalApplicants' => Applicants::where('ApplicationStatus','Processing')->count(),
                     ];
                     return response()->json($data,200);
 
@@ -66,7 +65,7 @@ class UsersController extends Controller
                     */
 
                     $data = [
-                        'Applicants' => Applicants::where('ApplicationStatus','Processing')->lazy(),
+                        'Applicants' => Applicants::where('ApplicationStatus','Processing')->orderBy('Name')->lazy(),
                     ];
 
                     return response()->json($data,200);
@@ -77,7 +76,7 @@ class UsersController extends Controller
                     */
 
                     $data = [
-                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->lazy(),
+                        'Applicants' => Applicants::whereNot('ApplicationStatus','Processing')->orderBy('created_at','desc')->lazy(),
                     ];
     
                     return response()->json($data,200);
@@ -89,92 +88,104 @@ class UsersController extends Controller
 
 
                     $data = [
-                        'Supervisors' => User::where('Role',"SUP")->lazy(),
+                        'Supervisors' => User::where('Role',"SUP")->orderBy('Name')->lazy(),
                     ];
                     return response()->json($data,200);
 
                     break;
 
 		case 'api/Admin/User/Interns' :
-            /**
-             * When a request is made this route by an admin it returns all the interns 
-             */
+			/**
+			 * When a request is made this route by an admin it returns all the interns 
+			 */
+
 			$Interns = User::where('Role','INT')->orderBy('Name')->lazy();
 
 			$CleanedInterns = $Interns->map(function($item)
 			{
-                
-            
-                if(!$item->Supervisor == null)
-                {
-                    $item->supervisor = $item->supervisor->Name;
-                    unset($item['Supervisor']);
-                    return $item;
-                }
-                else
-                return $item;
+				if(!$item->Supervisor == null)
+				{
+					$item->supervisor = $item->supervisor->Name;
+					unset($item['Supervisor']);
+					return $item;
+				}
+				else
+					return $item;
 				
+			
 			});
+			
+			$data = [
 
-                    $data = [
+				'Interns' => $CleanedInterns,
+			
+			];
+			
+			return response()->json($data,200);
 
-                        'Interns' => $CleanedInterns,
-                    ];
-                    return response()->json($data,200);
+			break;
 
-                    break;
-
-                default :
-                    return response()->json(["Message" => "No such route"],400);
-
-                    break;
-
+		default :
+			
+			return response()->json(["Message" => "No such route"],400);
 
 
-
-            }
+	    
+	    }
 
 	    }
 
-        else if($request->user()->tokenCan('Supervisor')){
+	    
+	    else if($request->user()->tokenCan('Supervisor')){
 
-            switch ($request->path()){
+		    
+		    switch ($request->path()){
 
-                case 'api/Supervisor/User/AssignedTasks' :
+		    
+		    case 'api/Supervisor/User/AssignedTasks' :
+	
+			    $data = [
+		    
+				    'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->orderBy('Name')->lazy(),
+			
+			    ];
+			    
+			    return response()->json($data,200);
 
-                    $data = [
-                        'TasksAssigned' => Task::where('AssignedBy',$request->user()->user_id)->lazy(),
-                    ];
-                    return response()->json($data,200);
+    
+		    case 'api/Supervisor/User/MyInterns' :
 
-                    break ;
+			    $data =[
+		    
+				    'MyInterns' => User::where('Supervisor',$request->user()->user_id)->orderBy('Name')->lazy(),       
+			    ];
+	    
+			    return response()->json($data,200);
+                 
 
-                case 'api/Supervisor/User/MyInterns' :
+		    default:
 
-                    $data =[
-                        'MyInterns' => User::where('Supervisor',$request->user()->user_id)->lazy(),
-                        
-                    ];
+			    $data = [
+	    
+				    'user' => User::findorfail($request->user()->user_id)
+		
+			    ];
+			
+			    return response()->json($data,200);
 
-                    return response()->json($data,200);
+		    
+		    }
 
-                    break ;
+	    
+	    }
 
-                default:
-
-                   $data = [
-                        'user' => User::findorfail($request->user()->user_id)
-                    ];
-                    return response()->json($data,200);
-
-            }
-
-        }
-
-        else
-        {
-            return response()->json(["user" => $request->user()],200);
-        }
+	    
+	    else
+	    {
+		    
+		    return response()->json(["user" => $request->user()],200);
+	    }
+    
     }
 
 
@@ -221,7 +232,7 @@ class UsersController extends Controller
 		
 		'Name' => ['required'],
 		'Email' => ['required'],
-	    	'PhoneNumber' =>['min_digits:8'],
+	    	'PhoneNumber' =>['required'],
    		'Position' => ['required'],
 		'Role' => ['required'],
 	]);
@@ -236,10 +247,11 @@ class UsersController extends Controller
 
         $user->Supervisor = $request->input('Supervisor',null);
         $user->Status = true;
-        $user->password = Hash::make($request->input('password',$user->PhoneNumber));
-        
+	$user->password = Hash::make($request->input('password',$user->PhoneNumber));
+
+        CreatedSupervisor::dispatch($user->Email);
         $user->save();
-        //PasswordReset::dispatch($user);
+        
 
         return response()->json(["message" => "Successfully created"],201);
     }
@@ -264,8 +276,8 @@ class UsersController extends Controller
 
                 $data =[
                    'User' => $user,
-                   "Interns" => User::where('Supervisor',$user->user_id)->lazy(),
-                   "Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->lazy()
+                   "Interns" => User::where('Supervisor',$user->user_id)->orderBy('created_at')->lazy(),
+                   "Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->orderBy('created_at')->lazy()
                 ];
                 return response()->json($data,200);
             }
