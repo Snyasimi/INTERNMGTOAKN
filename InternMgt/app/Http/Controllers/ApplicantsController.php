@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\InterviewDeclined;
 use App\Events\InterviewPassed;
 use App\Events\InterviewStatus;
 use App\Models\Position;
@@ -173,23 +174,23 @@ class ApplicantsController extends Controller
                {
 
                 case 'Accepted':
-                    $Email_body = $request->input('EmailBody');
-                    InterviewStatus::dispatch($Applicant,$Email_body);
+                    $Date = $request->Date('Date');
+                    InterviewStatus::dispatch($Applicant,$Date);
                     $data = [
                         'message' => 'Email Sent successfuly'
                     ];
         
                     return response()->json($data, 200);
 
-                    break;
+
                 case 'Declined' :
-                    $Email_body = "Declined";
-                    InterviewStatus::dispatch($Applicant,$Email_body);
+                    InterviewDeclined::dispatch($Applicant);
                     $data = [
                         'message' => 'Email Sent successfuly'
                     ];
         
                     return response()->json($data, 200);
+
                 case 'Passed' :
                         $Email_body = "Passed Interview";
                         InterviewPassed::dispatch($Applicant);
@@ -200,6 +201,7 @@ class ApplicantsController extends Controller
                         return response()->json($data, 200);
 
                 default:
+                
                 return response()->json(["message" => 'Nothing to update'],200);
                     
                     
