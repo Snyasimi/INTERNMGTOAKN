@@ -2,7 +2,7 @@
 @section('content')
 
 <p>
-Passed {{$Date}}
+declined
 </p>
 
 @endsection('content')

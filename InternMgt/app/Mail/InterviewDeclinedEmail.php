@@ -5,12 +5,11 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InternAccepted extends Mailable
+class InterviewDeclinedEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -19,10 +18,9 @@ class InternAccepted extends Mailable
      *
      * @return void
      */
-    public $Date;
-    public function __construct($date)
+    public function __construct()
     {
-        $this->Date = $date;
+        //
     }
 
     /**
@@ -33,8 +31,7 @@ class InternAccepted extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: "Interview Application Status",
-
+            subject: 'Interview Application Status ',
         );
     }
 
@@ -46,8 +43,7 @@ class InternAccepted extends Mailable
     public function content()
     {
         return new Content(
-            view: 'Mail.Interviewstatus',
-            with : ['Email_body' => $this->Email_body],
+            view: 'Mail.Declined',
         );
     }
 

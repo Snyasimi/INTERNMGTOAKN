@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class InterviewStatus
+class InterviewDeclined
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -20,21 +20,10 @@ class InterviewStatus
      *
      * @return void
      */
-    public $Name;
-    public $Email ;
-    public $PhoneNumber;
-    public $Position;
-    public $Role;
-    public $date;
-    
-    public function __construct(Applicants $Applicant,$Date)
+    public $ApplicantEmail;
+    public function __construct(Applicants $applicant)
     {
-        $this->Name = $Applicant->Name;
-        $this->Email = $Applicant->Email;
-        $this->PhoneNumber = $Applicant->PhoneNumber;
-        $this->Position = $Applicant->Position;
-        $this->date = $Date;
-        
+         $this->ApplicantEmail = $applicant->Email;
     }
 
     /**

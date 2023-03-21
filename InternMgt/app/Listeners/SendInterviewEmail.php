@@ -29,17 +29,11 @@ class SendInterviewEmail
      */
     public function handle(InterViewStatus $event)
     {
-        Mail::to($event->Email)->send(new InternAccepted($event->Email_body));
+        Mail::to($event->Email)->send(new InternAccepted($event->date));
         //Applicants::where('Email',$event->Email)->update(['ApplicationStatus' => 'Accepted For Interview']);
 
-        if($event->Email_body=='Declined')
-        {
-            Applicants::where('Email',$event->Email)->update(['ApplicationStatus' => 'Declined']);
-        }
-        else
-        {
             Applicants::where('Email',$event->Email)->update(['ApplicationStatus' => 'Accepted For Interview']);
-        }
+        
         
     }
 }
