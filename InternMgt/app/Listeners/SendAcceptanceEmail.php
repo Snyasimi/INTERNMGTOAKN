@@ -40,7 +40,7 @@ class SendAcceptanceEmail
             'Status' => false
             
         ]);
-        Mail::to($event->Email)->send(new PassedInterview($user->user_id));
+        Mail::to($event->Email)->send(new PassedInterview($user->user_id,$event->Name,$event->Position));
         Applicants::where('Email',$event->Email)->update(['ApplicationStatus' => 'Interview Passed']);
     }
 }

@@ -22,9 +22,13 @@ class PassedInterview extends Mailable
     public $User_id;
     public $Signin_url;
     public $Decline_url; 
-    public function __construct($user_id)
+    public $Name;
+    public $Position;
+    public function __construct($user_id,$Name,$Position)
     {
         $this->User_id = $user_id;
+        $this->Name = $Name;
+        $this->Position = $Position;
         $this->Signin_url = route('Setpassword');
         $this->Decline_url = route('DeactivateAccount',['id' => $this->User_id]);
     }
@@ -51,10 +55,14 @@ class PassedInterview extends Mailable
         return new Content(
             view: 'Mail.PassedInterview',
 
-            with: ['Signin_url' => $this->Signin_url,
-                   'Decline_url' => $this->Decline_url              
-            ],
-        );
+            with: ['Name'=>$this->Name,
+            'Position'=> $this->Position,
+            'Signin_url' => $this->Signin_url,
+            'Decline_url' => $this->Decline_url              
+            
+        ],
+        
+    );
     }
 
     /**

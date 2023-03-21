@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 
 class InternAccepted extends Mailable
 {
@@ -19,10 +20,14 @@ class InternAccepted extends Mailable
      *
      * @return void
      */
+    public $Name;
+    public $Position;
     public $Date;
-    public function __construct($date)
+    public function __construct($Name,$Position,$date)
     {
-        $this->Date = $date;
+        $this->Name = $Name;
+        $this->Position = $Position;
+        $this->Date = Carbon::parse($date)->format('d/m/y');
     }
 
     /**
@@ -47,7 +52,7 @@ class InternAccepted extends Mailable
     {
         return new Content(
             view: 'Mail.Interviewstatus',
-            with : ['Email_body' => $this->Email_body],
+            with : ['Name'=> $this->Name,'Position'=> $this->Position,'Date' => $this->Date],
         );
     }
 

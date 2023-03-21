@@ -1,28 +1,53 @@
 @extends('Mail.layout.layout')
 @section('content')
 
-    {{-- <p> We are pleased to inform you that youre accepted for the internship opportunity</p>
-    <p>click here to create a password for yoyr account :  {{$Signin_url}}</p>
-    <p>click here to decline the offer : {{$Decline_url}}</p> --}}
-
+<table role="presentation" class="main">
+    <!-- START MAIN CONTENT AREA -->
     
-        <div class="container">
-          <div class="card p-6 p-lg-10 space-y-4 p-2 mb-3">
-            <h1 class="h2 fw-700">
-              Interview Passed
-            </h1>
-            <p>
-                We are pleased to inform you that youre accepted for the internship opportunity
-            </p>
-            <a class="btn btn-primary p-1 fw-700 w-lg-25 mb-3" href="">Click here to create a password for your account</a>
-            <a class="btn btn-danger p-1 fw-700 w-auto mb-2" href="">Click here to decline the offer</a>
-          </div>
-          {{-- <img class="ax-center mt-10 w-40" src="{{asset("public/logo-color.png")}}" /> --}}
-          <div class="text-muted text-center my-6 bg-light-subtle p-2 border border-dark">
-            Oaknet Business Limited.
-            GA Insurance House. Ralph Bunche Road<br>
-            Nairobi, Kenya <br>
-          </div>
-        </div>
+    <tr>
+        <td class="wrapper">
+            <table
+                role="presentation"
+                border="0"
+                cellpadding="0"
+                cellspacing="0"
+            >
+                <tr>
+                    <td>
+                        <p>Dear {{ $Name}},</p>
+                        <p>
+
+                I am writing to inform you that you have been selected for the {{$Position}} role at Oaknet Business.<br> 
+                Your interview with our team was extremely impressive, and we are excited to offer you an internship position in our organization.<br>
+                We believe that you have the skills and knowledge that will be a valuable addition to our team.<br>
+                        </p>
+                        <p>
+                We understand that you may need some time to consider the offer, and we want you to have ample time to make an informed decision.<br>
+                        </p>
+
+                                   
+                    </td>
+                    
+                    
+                </tr>
+               <tr class="flex" >
+                   <td>
+
+                     <a href="{{$Signin_url}}" target="_blank" class="accept">Accept</a>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <a href="{{$Decline_url}}" target="_blank" class="decline">Decline</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- END MAIN CONTENT AREA -->
+</table>
+
     
 @endsection('content')

@@ -13,7 +13,7 @@ class AccountActivator extends Controller
 {
     public function active()
     {
-        return view('AccountActivator.Activate');
+        return redirect()->away('http://192.168.137.1:3000/signUp');
     }
     public function Activate(Request $request)
     {
@@ -58,7 +58,11 @@ class AccountActivator extends Controller
     {
         try
         {
-            User::destroy($id);
+            
+            $user = User::findorfail($id);
+            Applicants::where('Email',$user->Email)->delete();
+            $user->delete();
+            
             return response()->json(["message" => "Application Declined"],200);
         }
         catch(ModelNotFoundException)
