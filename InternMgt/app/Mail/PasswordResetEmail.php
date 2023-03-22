@@ -24,7 +24,7 @@ class PasswordResetEmail extends Mailable
     public function __construct($UserID)
     {
         $this->user_id = $UserID;
-        $this->reset_url = route('ResetPassword',['id' => $this->user_id]);
+        $this->reset_url = 'Shubhs frontend';//route('ResetPassword',['id' => $this->user_id]);
     }
 
     /**

@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 use App\Events\{AcceptedIntern,PasswordReset,AssignedSupervisor,CreatedSupervisor};
-use App\Models\Applicants;
-use App\Models\Position;
-use App\Models\Task;
+use App\Models\{User,Role,Applicants,Position,Task};
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Department;
-use App\Models\User;
-use App\Models\Role;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -22,9 +18,10 @@ class UsersController extends Controller
      */
 
 
-    //  public function __construct(){
-    //     $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
-    //  }
+     public function __construct()
+     {
+        $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
+     }
 
 
 
@@ -52,8 +49,8 @@ class UsersController extends Controller
                     $data = [
                         'TotalUsers' => User::all()->count(),
                         'TotalSupervisors' => User::where('Role',"SUP")->count(),
-			'TotalInterns' => User::where('Role',"INT")->count(),
-			'SelectedApplicants' => Applicants::whereNot('ApplicationStatus','Processing')->count(),
+                        'TotalInterns' => User::where('Role',"INT")->count(),
+                        'SelectedApplicants' => Applicants::whereNot('ApplicationStatus','Processing')->count(),
                         'TotalApplicants' => Applicants::where('ApplicationStatus','Processing')->count(),
                     ];
                     return response()->json($data,200);
@@ -198,8 +195,8 @@ class UsersController extends Controller
      {
         
          $Supervisors = User::where('Role','SUP')->get();
-         $roles = Role::all();
-         $positions = Position::all();
+         $roles = Role::lazy();
+         $positions = Position::lazy();
 
     //    $data = [
             
@@ -230,26 +227,28 @@ class UsersController extends Controller
 
         $validate = $request->validate([
 		
-		'Name' => ['required'],
-		'Email' => ['required'],
-	    	'PhoneNumber' =>['required'],
-   		'Position' => ['required'],
-		'Role' => ['required'],
+            'Name' => ['required'],
+            'Email' => ['required'],
+	    	'PhoneNumber' =>['required','size:13'],
+            'Position' => ['required'],
+            'Role' => ['required'],
 	]);
 
 
         $user = new User;
-        $user->Name = $validate['Name'];//$request->input('Name');
-        $user->Email = $validate['Email'];//$request->input('Email');
-        $user->PhoneNumber = $validate['PhoneNumber'];//$request->input('PhoneNumber');
-	    $user->Position = $validate['Position'];//$request->input('Position');
-	    $user->Role = $validate['Role'];//$request->input('Role');
+        $user->Name = $validate['Name'];
+        $user->Email = $validate['Email'];
+        $user->PhoneNumber = $validate['PhoneNumber'];
+	    $user->Position = $validate['Position'];
+	    $user->Role = $validate['Role'];
 
         $user->Supervisor = $request->input('Supervisor',null);
         $user->Status = true;
-	$user->password = Hash::make($request->input('password',$user->PhoneNumber));
 
-        CreatedSupervisor::dispatch($user->Email);
+        $user->password = bcrypt($request->input('password',$user->PhoneNumber));
+
+        $user->Role == 'SUP' ? CreatedSupervisor::dispatch($user->Email) :$user->save();
+
         $user->save();
         
 
@@ -356,81 +355,96 @@ class UsersController extends Controller
         */
 
 	if ($request->has(['SupervisorID','InternID']))
+
 	{
-		$validate = $request->validate([
+        try
+        {
+            $validate = $request->validate([
 			
-			'SupervisorID' => ['required'],
-			'InternID' => ['required']	
-		
-		]);
+                'SupervisorID' => ['required'],
+                'InternID' => ['required']	
+            
+            ]);
+    
+            
+            
+            User::where('user_id',$validate['InternID'])
+    
+                ->update(['Supervisor' => $validate['SupervisorID']]);
+            
+            
+            AssignedSupervisor::dispatch(User::findorfail($validate['SupervisorID']),User::findorfail($validate['InternID']));
+    
+    
+            return response()->json(['message'=>'Updated',200]);
 
+        }
+        catch(ModelNotFoundException)
+        {
+            return response()->json(['message'=>'No such user'],404);
+        }
 		
-		
-		User::where('user_id',$validate['InternID'])
-
-			->update(['Supervisor' => $validate['SupervisorID']]);
-		
-		$Supervisor = User::findorfail($validate['SupervisorID']);
-		
-		$Attachee = User::findorfail($validate['InternID']);
-		
-		AssignedSupervisor::dispatch($Supervisor,$Attachee);
-
-
-		return response()->json(['message'=>'Updated',200]);
 	}
 
  	else
 	{
-		$role = Auth::user()->Role;
-		$user = User::findorfail($id);
+        try
+        {
+         
+            $role = Auth::user()->Role;
+		
+            $user = User::findorfail($id);
 
-		switch ($role)
-		{
-		case "ADM":
-			$validate = $request->validate([
-				'Name' => ['required'],
-				'Email' => ['required'],
-				'Position' => ['required'],
-				'PhoneNumber' => ['required']
-			]);
+		
+            switch ($role)
+            {
+		
+                case "ADM":
+		
+                    $validate = $request->validate([
+                        'Name' => ['required'],
+                        'Email' => ['required'],		
+                        'Position' => ['required'],
+                        'PhoneNumber' => ['required']		
+                    ]);
 
+                    $user->Name = $validate['Name'];
+                    $user->Email = $validate['Email'];
+                    $user->Position = $validate['Position'];
+                    $user->PhoneNumber = $validate['PhoneNumber'];			
+                    $user->save();
+
+                    return response()->json(['Message' => 'ok'],200);
 			
-			
-			$user->Name = $validate['Name'];
-			$user->Email = $validate['Email'];
-			$user->Position = $validate['Position'];
-			$user->PhoneNumber = $validate['PhoneNumber'];
 
-            
-			$user->save();
+                case "INT" || "SUP":
 
-         	return response()->json(['Message' => 'ok'],200);
-			
+                    $validate = $request->validate([
 
-		case "INT" || "SUP":
-			$validate = $request->validate([
-				'Name' => ['required'],
-				'Email' => ['required'],
-				'PhoneNumber' => ['required']
-			]);
+                        'Name' => ['required'],
+                        'Email' => ['required'],
+                        'PhoneNumber' => ['required']	
+                    ]);
+		
+                $user->Name = $validate['Name'];
+                $user->PhoneNumber = $validate['PhoneNumber'];
+                $user->Email = $validate['Email'];
 
-			$user->Name = $validate['Name'];
-			$user->PhoneNumber = $validate['PhoneNumber'];
-			$user->Email = $validate['Email'];
+                return response()->json(['Message' => 'ok'],200);
 
-			return response()->json(['Message' => 'ok'],200);
+                default:			
+                
+                return response()->json(['Message' => 'Error'],404);
 
+            }
+        
+        }
+        catch(ModelNotFoundException)
+        {
+            return response()->json(['message'=>'No such user'],404);
+        }
 
-
-
-		default:
-			return response()->json(['Message' => 'Error'],404);
-
-		}
-
-
-	}
+    }
      
 
     }

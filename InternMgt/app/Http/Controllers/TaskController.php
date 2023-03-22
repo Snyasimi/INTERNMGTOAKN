@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CommentAndRemark;
-use App\Models\Task;
-use App\Models\User;
-use Illuminate\Support\Arr;
+use App\Models\{CommentAndRemark,Task,User};
 use App\Events\TaskAssigned;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -100,9 +97,9 @@ class TaskController extends Controller
 	
 	$Task = new Task;
 	$Task->AssignedTo = $validate['AssignedTo'];
-    	$Task->Task = $request->input('Task');
-        $Task->Description = $request->input('TaskDescription');
-	$Task->Deadline = Carbon::parse($request->date('Deadline'))->format('d/m/y');
+    	$Task->Task = $validate['Task'];
+        $Task->Description = $validate['TaskDescription'];
+	$Task->Deadline = $validate['Deadline'];//Carbon::parse($validate['Deadline'])->format('m/d/y');
 
 	$Task->Status = "Assigned";
 	
@@ -141,10 +138,8 @@ class TaskController extends Controller
 		});	
 	    
 		$data = [
-			
 			'task' => $task,
 			'Supervisor' => $task->Assignedby->Name,
-			'remarks' => ['lalala'],
 			'comment' => $CleanedComments
 		];
 		
@@ -169,16 +164,18 @@ class TaskController extends Controller
     public function edit($id)
     {
         //RETURN ONLY THE BODY AND THE ASSIGNED TO
-        try{
+        try
+        {
 		
-		$data = [
-			'task' => Task::findorfail($id),	
-			'message' => 'view task'
-		];
+            $data = [
+                'task' => Task::findorfail($id),	
+                'message' => 'view task'
+            ];
 		
-		return response()->json($data, 200);
+		
+            return response()->json($data, 200);
 	
-	}
+        }
 	
 	catch(ModelNotFoundException)
 	{
@@ -207,7 +204,7 @@ class TaskController extends Controller
 	    $Task = Task::findorfail($id);
 	    $Task->Task = $validate['Task'];
 	    $Task->Description = $validate['Description'];
-	    $Task->Deadline = Carbon::parse($validate['Deadline'])->format('d/m/y');
+	    $Task->Deadline = $validate['Deadline'];
 	    $Task->save();
 	    
 	    return response()->json(["msg" => "ok"],200);

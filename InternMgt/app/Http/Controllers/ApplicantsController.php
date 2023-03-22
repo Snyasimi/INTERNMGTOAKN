@@ -1,11 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Events\InterviewDeclined;
-use App\Events\InterviewPassed;
-use App\Events\InterviewStatus;
+use App\Events\{InterviewDeclined,InterviewPassed,InterviewStatus};
 use App\Models\Position;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Applicants;
 use Illuminate\Http\Request;
@@ -60,38 +59,45 @@ class ApplicantsController extends Controller
 	     * 
 	     * */
     {
-	     $validate = $request->validate([
-	    	'Name' => ['required'],
-		    'Email' => ['required'],
-		    'PhoneNumber' =>['required'],
-		    'Position' => ['required'],
-		    //'Cv'=>['required','file'],
-            //'AttachmentLetter' => ['required','file']
-
-	    ]);
-
-
-	    
-	     $url_to_cv = $request->file('Cv')->store('public');
-	     $url_to_attachment_letter = $request->file('AttachmentLetter')->store('public');
-         
-
-	   $applicant = Applicants::create([
-		   'Name' => $request->input('Name'),
-		   'Email' => $request->input('Email'),
-		   'PhoneNumber' => $request->input('PhoneNumber'),
-		   'Position' => $request->input('Position'),
-
-		   
-		   'url_to_cv_file' => $url_to_cv,	
-		   'url_to_attachment_letter' => $url_to_attachment_letter,
-	
-		   'ApplicationStatus' => 'Processing'
+        try
+        {
+            $validate = $request->validate([
+                'Name' => ['required'],
+                'Email' => ['required'],
+                'PhoneNumber' =>['required','size:13'],
+                'Position' => ['required'],
+                'Cv'=>['required','file','mimetypes:pdf'],
+                'AttachmentLetter' => ['required','file','mimetypes:pdf']
+    
+            ]);
+    
+             $url_to_cv = $request->file('Cv')->store('public');
+             $url_to_attachment_letter = $request->file('AttachmentLetter')->store('public');
+             
+    
+           $applicant = Applicants::create([
+               'Name' => $validate['Name'],
+               'Email' => $validate['Email'],
+               'PhoneNumber' => $validate['PhoneNumber'],
+               'Position' => $validate['Position'],
+    
+               
+               'url_to_cv_file' => $url_to_cv,	
+               'url_to_attachment_letter' => $url_to_attachment_letter,
         
-	   
-	   ]);
+               'ApplicationStatus' => 'Processing'
+            
+           
+           ]);
+    
+            return response()->json(["message" => "Created"], 201);
+        }
+        catch(QueryException)
+        {
+            return response("Make sure the data you hvae entered is correct");
 
-	    return response()->json(["message" => "Created"], 200);
+        }
+	     
 
 
     }
@@ -174,7 +180,10 @@ class ApplicantsController extends Controller
                {
 
                 case 'Accepted':
-                    $Date = $request->Date('Date');
+                    $validate = $request->validate([
+                        'Date' => ['required']
+                    ]);
+                    $Date = $validate['Date'];
                     InterviewStatus::dispatch($Applicant,$Date);
                     $data = [
                         'message' => 'Email Sent successfuly'
@@ -184,6 +193,7 @@ class ApplicantsController extends Controller
 
 
                 case 'Declined' :
+                    
                     InterviewDeclined::dispatch($Applicant);
                     $data = [
                         'message' => 'Email Sent successfuly'
@@ -192,7 +202,7 @@ class ApplicantsController extends Controller
                     return response()->json($data, 200);
 
                 case 'Passed' :
-                        $Email_body = "Passed Interview";
+
                         InterviewPassed::dispatch($Applicant);
                         $data = [
                             'message' => 'Email Sent successfuly'

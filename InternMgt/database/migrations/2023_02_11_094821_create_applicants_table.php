@@ -17,7 +17,7 @@ return new class extends Migration
 		$table->id();
 		$table->string('Name');
 		$table->string('Email')->unique();
-		$table->integer('PhoneNumber');
+		$table->string('PhoneNumber',14);
 
 		$table->string('Position');
         $table->foreign('Position')->references('Position')->on('positions');

@@ -27,7 +27,7 @@ class AccountActivator extends Controller
              
             $user = User::where('Email',$validate['email'])->first();
 
-            if ($user) 
+            if ($user && $user->password == null) 
             {
                 $user->Status=true;
                 $user->password = bcrypt($validate['password']);
@@ -36,8 +36,9 @@ class AccountActivator extends Controller
                 return response()->json(["message"=> "Password Updated"],201);
             }
             else
-           {
+            {
                 return response()->json(["message" => "Please Apply to Login"],401);
+        
             }
 
 
@@ -45,7 +46,7 @@ class AccountActivator extends Controller
 
         catch(ModelNotFoundException)
         {
-                         return response()->json(["message" => "Declined"],400);
+           return response()->json(["message" => "Declined"],400);
         }
 
 
@@ -67,7 +68,7 @@ class AccountActivator extends Controller
         }
         catch(ModelNotFoundException)
         {
-                         return response()->json(["message" => "Applicant Not found"],404);
+           return response()->json(["message" => "Applicant Not found"],404);
         }
          
 
@@ -108,18 +109,23 @@ class AccountActivator extends Controller
             'email' => ['required']
         ]);
         $user = User::where('Email', $validate['email'])->first();
+        $user->tokens()->delete();
+        
         PasswordReset::dispatch($user);
 
         return response()->json(["message" => "You will recieve an email to reset your password"],200);
     }
+
     public function ResetPassword(Request $request)
     {
+        
         $validate = $request->validate([
+            'email' => ['required'],
             'password' => ['required']
         ]);
 
         
-        User::where('user_id',Auth::user()->user_id)->update(['password'=>bcrypt($validate['password'])]);
+        User::where('Email',$validate['Email'])->update(['password'=>bcrypt($validate['password'])]);
      
         return response()->json(["message" => "Password Updated"]);   
 

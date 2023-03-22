@@ -21,7 +21,7 @@ return new class extends Migration
 	
 		$table->string('Name');
 		$table->string('Email')->unique();	
-		$table->integer('PhoneNumber');
+		$table->string('PhoneNumber',14);
 
 		
 		$table->string('Position')->nullable();
@@ -38,6 +38,7 @@ return new class extends Migration
 
 		
 		$table->string('password')->nullable();
+        //uncomment the code beow to add remember me functionality
 		//$table->rememberToken();
 		$table->timestamps();
 	

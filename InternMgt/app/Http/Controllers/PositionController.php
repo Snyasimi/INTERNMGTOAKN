@@ -18,7 +18,7 @@ class PositionController extends Controller
     public function index()
     {
         $data =[
-            'Positions'=> Position::all(),
+            'Positions'=> Position::lazy(),
             'message' => 'Displaying positions'
         ];
 
@@ -44,7 +44,7 @@ class PositionController extends Controller
     public function store(Request $request)
     {
         $validate = request()->validate([
-            "Position" => ['required','unique:positions']
+            "Position" => ['required','unique:App\Models\Position,positions']
         ]);
 
         Position::create($validate);
