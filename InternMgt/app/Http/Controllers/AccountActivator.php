@@ -14,7 +14,13 @@ class AccountActivator extends Controller
 {
     public function active()
     {
+        //INSERT FRONT END URL HERE
         return redirect()->away('http://192.168.137.1:3000/signUp');
+    }
+    public function PasswordResetRedirect($id)
+    {
+        //INSERT FRONTEND URL HERE
+        return redirect()->away('http://192.168.1.146:3000/resetPassword/'.$id);
     }
     public function Activate(Request $request)
     {
@@ -186,10 +192,7 @@ class AccountActivator extends Controller
     }
 
 
-    public function PasswordResetRedirect($id)
-    {
-        return redirect()->away('http://192.168.1.146:3000/resetPassword/'.$id);
-    }
+ 
     // public function ForgotPassword(Request $request)
     // {
     //     try
