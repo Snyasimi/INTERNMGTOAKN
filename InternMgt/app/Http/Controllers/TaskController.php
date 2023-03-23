@@ -16,10 +16,17 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-
-    public function __construct(){
-        $this->middleware('ability:Admin,Supervisor')->except(['index','show','update','edit']);
-     }
+     /**
+      * This function is supposed to allow only certain actions based on the 
+      *token ability of the user.
+      *uncomment to allow restrictions 
+      *if uncommented it allows all restrictions except on functions like index,show,update and edit (youre required to 
+      * have admin or supervisor privilages to do the other action)
+       
+      */
+    // public function __construct(){
+    //     $this->middleware('ability:Admin,Supervisor')->except(['index','show','update','edit']);
+    //  }
 
     public function index()
     {
