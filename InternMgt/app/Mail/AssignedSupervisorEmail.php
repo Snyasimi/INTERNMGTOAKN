@@ -34,7 +34,7 @@ class AssignedSupervisorEmail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Assigned Supervisor Email',
+            subject: 'Your Assigned Supervisor',
         );
     }
 

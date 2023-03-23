@@ -66,8 +66,8 @@ class ApplicantsController extends Controller
                 'Email' => ['required'],
                 'PhoneNumber' =>['required','size:13'],
                 'Position' => ['required'],
-                'Cv'=>['required','file','mimetypes:pdf'],
-                'AttachmentLetter' => ['required','file','mimetypes:pdf']
+                'Cv'=>['required','file'],
+                'AttachmentLetter' => ['required','file']
     
             ]);
     

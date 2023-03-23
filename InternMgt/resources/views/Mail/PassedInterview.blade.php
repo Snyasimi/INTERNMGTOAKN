@@ -40,6 +40,7 @@
                 <tr>
                     <td>
                         <a href="{{$Decline_url}}" target="_blank" class="decline">Decline</a>
+                        <strong><em>NOTE Once you decline the offer you will  have to apply again<em></strong>
                     </td>
                 </tr>
             </table>

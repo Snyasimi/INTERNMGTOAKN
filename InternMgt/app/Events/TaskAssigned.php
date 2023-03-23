@@ -21,11 +21,13 @@ class TaskAssigned
      */
     public $Email;
     public $Task;
+    public $Deadline;
     
-    public function __construct($email,$task)
+    public function __construct($email,$task,$deadline)
     {
 	    $this->Email = $email;
 	    $this->Task = $task;
+        $this->Deadline = $deadline;
     }
 
     /**

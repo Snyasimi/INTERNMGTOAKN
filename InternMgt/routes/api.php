@@ -32,6 +32,9 @@ Route::post('ApplicationStatus',[AccountActivator::class,'CheckStatus']);
 
 Route::post('PasswordReset',[AccountActivator::class,'RequestPasswordReset'])->name('Requestpasswordreset');
 Route::post('ForgotPassword',[AccountActivator::class,'ForgotPassword'])->name('ForgotPasword');
+Route::post('Reset',[AccountActivator::class,'ResetPassword'])->name('ResetPassword');
+Route::get('ResetPassword/{id}',[AccountActivator::class,'PasswordResetRedirect'])->name('ResetRedirect');
+
 
 Route::post("Account/Activate",[AccountActivator::class,'Activate'])->name('ActivateAccount');
 Route::get("Account/Sign-in",[AccountActivator::class,'active'])->name('Setpassword');
@@ -66,7 +69,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::put('Comment/{id}',[CommentController::class,'update']);
 	Route::get('Comment/{id}',[CommentController::class,'index']);
 	Route::post('logout',[LoginController::class,'logout']);
-	Route::post('Reset',[AccountActivator::class,'ResetPassword'])->name('ResetPassword');
+	
 
 
 	}

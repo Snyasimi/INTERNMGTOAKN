@@ -28,6 +28,6 @@ class SendTaskAssignedEmail
      */
     public function handle(TaskAssigned $event)
     {
-	    Mail::to($event->Email)->send(new TaskAssignedEmail($event->Task));
+	    Mail::to($event->Email)->send(new TaskAssignedEmail($event->Task,$event->Deadline));
     }
 }

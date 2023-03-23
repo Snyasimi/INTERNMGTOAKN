@@ -19,12 +19,14 @@ class PasswordResetEmail extends Mailable
      *
      * @return void
      */
-    public $user_id;
+    public $token;
     public $reset_url; 
-    public function __construct($UserID)
+
+    public function __construct($token)
     {
-        $this->user_id = $UserID;
-        $this->reset_url = 'Shubhs frontend';//route('ResetPassword',['id' => $this->user_id]);
+        $this->token = $token;
+        $this->reset_url = route('ResetRedirect',['id' => $token]);
+        //$this->reset_url = 'Shubhs frontend';//route('ResetPassword',['id' => $this->user_id]);
     }
 
     /**
@@ -48,7 +50,9 @@ class PasswordResetEmail extends Mailable
     {
         return new Content(
             view: 'Mail.PasswordReset',
-            with: ['url' => $this->reset_url]
+            with: [
+                     'reset_url' => $this->reset_url
+            ]
         );
     }
 

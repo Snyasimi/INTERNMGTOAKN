@@ -17,9 +17,9 @@ class TaskController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    // public function __construct(){
-    //     $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit']);
-    //  }
+    public function __construct(){
+        $this->middleware('ability:Admin,Supervisor')->except(['index','show','update','edit']);
+     }
 
     public function index()
     {
@@ -106,7 +106,7 @@ class TaskController extends Controller
        $Supervisor->Assign()->save($Task);
 	
         
-	TaskAssigned::dispatch($intern->Email,$validate['TaskDescription']);
+	TaskAssigned::dispatch($intern->Email,$validate['TaskDescription'],$validate['Deadline']);
 
 
 	$data = [

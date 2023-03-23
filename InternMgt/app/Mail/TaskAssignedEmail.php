@@ -19,9 +19,11 @@ class TaskAssignedEmail extends Mailable
      * @return void
      */
     public $task;
-    public function __construct($Task)
+    public $deadline;
+    public function __construct($Task,$Deadline)
     {
         $this->task = $Task;
+        $this->deadline = $Deadline;
     }
 
     /**
@@ -46,7 +48,9 @@ class TaskAssignedEmail extends Mailable
     {
         return new Content(
 		view: 'Mail.TaskAssigned',
-		with:['Task'=> $this->task]
+		with:['Task'=> $this->task,
+            'Deadline' => $this->deadline
+        ]
         );
     }
 

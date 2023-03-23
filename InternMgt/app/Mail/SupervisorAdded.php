@@ -31,7 +31,7 @@ class SupervisorAdded extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Supervisor',
+            subject: 'Addition as Supervisor - Login Information',
         );
     }
 

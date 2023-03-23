@@ -20,12 +20,14 @@ class PasswordReset
      *
      * @return void
      */
+    public $token;
+    public $Name;
     public $email;
-    public $user_id;
-    public function __construct(User $user)
+    public function __construct(User $user,$token)
     {
         $this->email = $user->Email;
-        $this->user_id = $user->user_id;
+        $this->token = $token;
+        $this->Name = $user->Name;
     }
 
     /**

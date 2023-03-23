@@ -20,9 +20,11 @@ class InterviewDeclined
      *
      * @return void
      */
+    public $ApplicantId;
     public $ApplicantEmail;
     public function __construct(Applicants $applicant)
     {
+        $this->ApplicantId = $applicant->id;
          $this->ApplicantEmail = $applicant->Email;
     }
 

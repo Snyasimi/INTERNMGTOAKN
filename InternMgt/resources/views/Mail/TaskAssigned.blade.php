@@ -17,10 +17,12 @@
                 <tr>
                     <td>
                             
+   
+                        I have assigned you a task related to {{$task}}.<br>
+                         Please complete it by {{$Deadline}}.
 
-                <p>You have been assigned a Task </p>
-				<p> Your task is to {{$Task}}</p>
-                        
+                         Let me know if you have any questions or concerns regarding the task.
+                          I am available to assist you in any way I can.
                                    
                     </td>
                     

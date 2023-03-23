@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AccountActivator extends Controller
 {
@@ -105,49 +106,107 @@ class AccountActivator extends Controller
     }
     public function RequestPasswordReset(Request $request)
     {
-        $validate = $request->validate([
-            'email' => ['required']
-        ]);
-        $user = User::where('Email', $validate['email'])->first();
-        $user->tokens()->delete();
-        
-        PasswordReset::dispatch($user);
+        try
+        {
+            $validate = $request->validate([
+                'email' => ['required']
+            ]);
+            $user = User::where('Email', $validate['email'])->first();
+            $user->tokens()->delete();
 
-        return response()->json(["message" => "You will recieve an email to reset your password"],200);
+            $token = $user->createToken('Reset-password',['ResetPassword'])->plainTextToken;
+            
+            PasswordReset::dispatch($user,$token);
+    
+            return response()->json(["message" => "You will recieve an email to reset your password"],200);
+        }
+        catch(ModelNotFoundException)
+        {
+            return response()->json(['message' => 'No Such user'],404);
+        }
     }
 
     public function ResetPassword(Request $request)
     {
-        
-        $validate = $request->validate([
-            'email' => ['required'],
-            'password' => ['required']
-        ]);
-
-        
-        User::where('Email',$validate['Email'])->update(['password'=>bcrypt($validate['password'])]);
-     
-        return response()->json(["message" => "Password Updated"]);   
-
-    }
-
-    public function ForgotPassword(Request $request)
-    {
         try
         {
             $validate = $request->validate([
-                'email' => ['required'],
-                'password' => ['required']
+                'token' => ['required'],
+                'password' => ['required'],
+        
             ]);
 
-            User::firstWhere('Email',$validate['email'])->update(['password'=> bcrypt($validate['password'])]);
-            return response()->json(['message'=>'Password reset'],200);
+            function removeFirstCharactersUpToCharacter($string, $character) {
+                // Find the position of the character to remove up to
+                $pos = strpos($string, $character);
+                // If the character is found, remove the characters up to and including it
+                if ($pos !== false) {
+                    $string = substr($string, $pos + 1);
+                }
+            
+                return $string;
+            }
+            $Token = removeFirstCharactersUpToCharacter($validate['token'],"|");
+            
+
+            $token = DB::table('personal_access_tokens')->where('token','=', hash('sha256',$Token))
+                            ->where('abilities','=','["ResetPassword"]')->first();
+
+    
+            if($token)
+            {
+                $user = User::findorfail($token->tokenable_id);
+                
+                if($user)
+                {
+                    
+                    $user->password = bcrypt($validate['password']);
+                    $user->save();
+                    $user->tokens()->delete();
+                    return response()->json(["message" => "Password Updated"],200);
+                }
+                else
+                {
+                    return response()->json(['message' => 'User did not request password reset'],406);
+                }
+    
+            }
+    
+            else
+            {
+                return response()->json(['message' => 'User Does not exist'],404);
+            }
+       
         }
         catch(ModelNotFoundException)
         {
-            return response()->json(['message'=> 'Does not exist'],404);
+            return response()->json(['message' => 'No such user'],404);
         }
+
     }
+
+
+    public function PasswordResetRedirect($id)
+    {
+        return redirect()->away('http://192.168.1.146:3000/resetPassword/'.$id);
+    }
+    // public function ForgotPassword(Request $request)
+    // {
+    //     try
+    //     {
+    //         $validate = $request->validate([
+    //             'email' => ['required'],
+    //             'password' => ['required']
+    //         ]);
+
+    //         User::firstWhere('Email',$validate['email'])->update(['password'=> bcrypt($validate['password'])]);
+    //         return response()->json(['message'=>'Password reset'],200);
+    //     }
+    //     catch(ModelNotFoundException)
+    //     {
+    //         return response()->json(['message'=> 'Does not exist'],404);
+    //     }
+    // }
 
 
 }

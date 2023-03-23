@@ -378,14 +378,14 @@
                                         >
                                     </td>
                                 </tr>
-                                <tr>
+                                {{-- <tr>
                                     <td class="content-block powered-by">
                                         <img
                                             src="{{ asset('public/logo-color.png')}}"
                                             alt="Oaknet Business Logo"
                                         />
                                     </td>
-                                </tr>
+                                </tr> --}}
                             </table>
                         </div>
                         <!-- END FOOTER -->
