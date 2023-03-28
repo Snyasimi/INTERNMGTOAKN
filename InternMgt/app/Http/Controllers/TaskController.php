@@ -107,13 +107,13 @@ class TaskController extends Controller
     	$Task->Task = $validate['Task'];
         $Task->Description = $validate['TaskDescription'];
 	$Task->Deadline = $validate['Deadline'];//Carbon::parse($validate['Deadline'])->format('m/d/y');
-
+        $Task->Rating = 0;
 	$Task->Status = "Assigned";
 	
        $Supervisor->Assign()->save($Task);
 	
         
-	TaskAssigned::dispatch($intern->Email,$validate['TaskDescription'],$validate['Deadline']);
+	TaskAssigned::dispatch($intern->Email,$validate['Task'],$validate['Deadline']);
 
 
 	$data = [
@@ -134,12 +134,17 @@ class TaskController extends Controller
     {
         try{
 		$task= Task::findOrfail($id);
+		/*
+		 * $task->AssignedTo = $task->Assignedto->Name;
+		 * $task->AssignedBy = $task->Assignedby->Name;
+		 */
          
 		$Comments =  CommentAndRemark::where('task_id',$task->id)->orderBy('created_at')->lazy();
 		$CleanedComments =  $Comments->map(function($cmts)
 		{
 			$cmts->madeby = $cmts->MadeBy->Name;
 			unset($cmts['made_by']);
+			
 			return $cmts;
 			
 		});	
@@ -147,6 +152,7 @@ class TaskController extends Controller
 		$data = [
 			'task' => $task,
 			'Supervisor' => $task->Assignedby->Name,
+			'Intern' => $task->Assignedto->Name,
 			'comment' => $CleanedComments
 		];
 		
@@ -256,6 +262,30 @@ class TaskController extends Controller
 	    }
 
     
+    }
+
+    public function Rate(Request $request ,$id)
+
+    {
+	    try
+	    {
+		    $validate = $request->validate([
+
+			    'rating' => ['required'],
+		    ]);
+
+		    Task::firstWhere('id',$id)->update(['Rating' => $validate['rating']]);
+
+		    return response()->json(['message' => 'Task rated'],200);
+
+
+
+
+	    }
+	    catch(ModelNotFoundException)
+        {
+            return response()->json(['message' => 'Cannot update'],400);
+        }
     }
 
 

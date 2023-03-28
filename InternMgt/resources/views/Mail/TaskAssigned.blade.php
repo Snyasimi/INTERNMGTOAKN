@@ -18,8 +18,9 @@
                     <td>
                             
    
-                        I have assigned you a task related to {{$task}}.<br>
-                         Please complete it by {{$Deadline}}.
+                        You have been assigned a new Task.<br>
+                        Your task is to {{$task}}.<br>
+                        Please complete it by {{$Deadline}}.
 
                          Let me know if you have any questions or concerns regarding the task.
                           I am available to assist you in any way I can.

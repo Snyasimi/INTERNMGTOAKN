@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('Task');
             $table->string('Description');
             $table->date('Deadline');
-            $table->string("Status");
+	    $table->string("Status");
+	    $table->integer('Rating',0)->nullable();
 
             $table->timestamps();
         });

@@ -6,7 +6,7 @@ use App\Models\{User,Role,Applicants,Position,Task};
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -18,10 +18,10 @@ class UsersController extends Controller
      */
 
 
-     public function __construct()
-     {
-        $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
-     }
+   //  public function __construct()
+     //{
+       // $this->middleware('ability:Admin,Supervisor')->except(['show','update','edit','destroy']);
+     //}
 
 
 
@@ -47,7 +47,7 @@ class UsersController extends Controller
                      */
 
                     $data = [
-                        'TotalUsers' => User::all()->count(),
+                        'TotalUsers' => User::count(),
                         'TotalSupervisors' => User::where('Role',"SUP")->count(),
                         'TotalInterns' => User::where('Role',"INT")->count(),
                         'SelectedApplicants' => Applicants::whereNot('ApplicationStatus','Processing')->count(),
@@ -229,7 +229,7 @@ class UsersController extends Controller
 		
             'Name' => ['required'],
             'Email' => ['required'],
-	    	'PhoneNumber' =>['required','size:13'],
+	    'PhoneNumber' =>['required','size:13'],
             'Position' => ['required'],
             'Role' => ['required'],
 	]);
@@ -239,8 +239,8 @@ class UsersController extends Controller
         $user->Name = $validate['Name'];
         $user->Email = $validate['Email'];
         $user->PhoneNumber = $validate['PhoneNumber'];
-	    $user->Position = $validate['Position'];
-	    $user->Role = $validate['Role'];
+	$user->Position = $validate['Position'];
+	$user->Role = $validate['Role'];
 
         $user->Supervisor = $request->input('Supervisor',null);
         $user->Status = true;
@@ -269,31 +269,51 @@ class UsersController extends Controller
         *If theres no such user it returns 404
         */ 
         try{
-            $user = User::findorfail($id);
+		
+		$user = User::findorfail($id);
 
-            if($user->Role == "SUP"){
+		
+		if($user->Role == "SUP"){
 
-                $data =[
-                   'User' => $user,
-                   "Interns" => User::where('Supervisor',$user->user_id)->orderBy('created_at')->lazy(),
-                   "Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->orderBy('created_at')->lazy()
-                ];
-                return response()->json($data,200);
-            }
+			$data =[
+				'User' => $user,
+				"Interns" => User::where('Supervisor',$user->user_id)->orderBy('created_at')->lazy(),
+				"Tasks Assigned" => Task::where('AssignedBy',$user->user_id)->orderBy('created_at')->lazy()
+			];
+			
+			return response()->json($data,200);
+		}
 
-            else{
-                $data = [
-                    'User' => $user
-                ];
-                return response()->json($data,200);
-        }
+		
+		else if($user->Role == "INT")
+		{
+			$user->Supervisor == !null 
+				? $user->Supervisor = $user->supervisor->Name 
+				: $user->Supervisor = 'No Supervisor Assigned';
+
+			$data = [
+
+				'User' => $user,
+				'Tasks' => DB::table('tasks')->select('Task','Rating')
+				            ->where('AssignedTo',$user->user_id)
+					    ->orderBy('created_at','asc')->lazy(),
+
+				'Overall' => DB::table('tasks')->select('Rating')
+				              ->where('AssignedTo',$user->user_id)->avg('Rating'),
+			];
+			
+			return response()->json($data,200);
+		}
+		else
+		{
+			return response()->json(['User' =>$user],200);
+		}
 
 
-        }
-        catch(ModelNotFoundException){
-             return response()->json([
-                'message' => 'No such user'
-             ],404);
+	}
+	catch(ModelNotFoundException)
+	{
+		return response()->json(['message' => 'No such user'],404);
         }
 
 
@@ -428,9 +448,10 @@ class UsersController extends Controller
 		
                 $user->Name = $validate['Name'];
                 $user->PhoneNumber = $validate['PhoneNumber'];
-                $user->Email = $validate['Email'];
+		$user->Email = $validate['Email'];
+		$user->save();
 
-                return response()->json(['Message' => 'ok'],200);
+                return response()->json(['Message' => 'updated'],200);
 
                 default:			
                 
@@ -471,18 +492,27 @@ class UsersController extends Controller
         }
     }
 
-    public function myInterns(Request $request){
+    public function Perfomance($id)
+    {
+     try{
 
-        if($request->has(['supervisor'])){
-        $user = User::findorfail($request->input('supervisor'));
-        $Interns = $user->Attachee();
-        }
+        $data = [
 
-        else{
-            $Supervisors = User::where('Supervisor','01gs7sfpbyvqk9t4hpaxjgjqjf')->get();
+            'User' => User::findorfail($id),
+			'Tasks' => DB::table('tasks')->select('Task','Rating')
+				        ->where('AssignedTo',$id)
+					    ->orderBy('created_at','asc')->lazy(),
 
-            return view('User.index',['supervisors' =>$Supervisors]);
-        }
+			'Overall' => DB::table('tasks')->select('Rating')
+				            ->where('AssignedTo',$id)->avg('Rating'),
+        ];
+        return response()->json($data,200);
+     }
+     catch(ModelNotFoundException)
+     {
+        return response()->json(['message' => 'Eror'],400);
+     }
 
+       
     }
 }

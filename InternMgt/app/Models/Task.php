@@ -12,8 +12,8 @@ class Task extends Model
         return ['AssignedBy','AssignedTo'];
     }
 
-
-    protected $hidden = ['AssignedBy','TaskDescription','created_at','updated_at'];
+    protected $fillable = ['Rating'];
+    protected $hidden = ['TaskDescription','created_at','updated_at'];
 
     public function comments(){
         return $this->hasMany(CommentAndRemark::class,"task_id");

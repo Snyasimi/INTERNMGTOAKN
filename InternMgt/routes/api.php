@@ -58,8 +58,10 @@ Route::middleware(['auth:sanctum'])->group(function(){
 
 		Route::get('User/AssignedTasks',[UsersController::class,'index'])->name('SupervisorAssignedTasks');
 		Route::get('User/MyInterns',[UsersController::class,'index'])->name('SupervisorMyInterns');
+		Route::post('Task/Rate/{id}',[TaskController::class,'Rate'])->name('RateTask');
+		Route::get('Perfomance/{id}',[UsersController::class,'Perfomance'])->name('CheckPerfomance');
 
-	})->middleware('ability:Admin');
+	})->middleware('ability:Admin,Supervisor');
 
 	Route::resource('User',Userscontroller::class);
 	Route::resource('Task',TaskController::class);
