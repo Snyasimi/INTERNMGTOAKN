@@ -294,12 +294,15 @@ class UsersController extends Controller
 			$data = [
 
 				'User' => $user,
-				'Tasks' => DB::table('tasks')->select('Task','Rating')
+				'Tasks' => DB::table('tasks')->select('Task','Rating','Status')
 				            ->where('AssignedTo',$user->user_id)
-					    ->orderBy('created_at','asc')->lazy(),
+					    ->orderBy('created_at','asc')
+					    ->lazy(),
 
 				'Overall' => DB::table('tasks')->select('Rating')
-				              ->where('AssignedTo',$user->user_id)->avg('Rating'),
+				   ->where('AssignedTo',$user->user_id)
+				   ->where('Status','Completed')
+				   ->avg('Rating'),
 			];
 			
 			return response()->json($data,200);
