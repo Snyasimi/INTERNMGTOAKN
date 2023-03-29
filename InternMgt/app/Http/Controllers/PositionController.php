@@ -44,7 +44,7 @@ class PositionController extends Controller
     public function store(Request $request)
     {
         $validate = request()->validate([
-            "Position" => ['required','unique:App\Models\Position,positions']
+            "Position" => ['required','unique:App\Models\Position,Position']
         ]);
 
         Position::create($validate);

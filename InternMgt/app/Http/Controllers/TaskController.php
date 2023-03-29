@@ -107,7 +107,7 @@ class TaskController extends Controller
     	$Task->Task = $validate['Task'];
         $Task->Description = $validate['TaskDescription'];
 	$Task->Deadline = $validate['Deadline'];//Carbon::parse($validate['Deadline'])->format('m/d/y');
-        $Task->Rating = 0;
+        
 	$Task->Status = "Assigned";
 	
        $Supervisor->Assign()->save($Task);
