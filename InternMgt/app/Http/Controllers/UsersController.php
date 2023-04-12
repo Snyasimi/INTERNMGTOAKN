@@ -42,7 +42,7 @@ class UsersController extends Controller
 	    {
             switch ($request->path()){
 
-                case env('DASHBOARD') :
+                case env('ADM_DASHBOARD') :
                     /**
                      * Results displayed are only the statistics 
                      */
