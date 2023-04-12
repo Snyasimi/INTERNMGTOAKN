@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Events\PasswordReset;
-use App\Models\Applicants;
+use App\Http\Requests\SignupRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\{User,Applicants};
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Password;
+use Symfony\Component\Mime\Email;
 
 class AccountActivator extends Controller
 {
@@ -22,15 +24,12 @@ class AccountActivator extends Controller
         //INSERT FRONTEND URL HERE
         return redirect()->away('http://192.168.1.146:3000/resetPassword/'.$id);
     }
-    public function Activate(Request $request)
+    public function Activate(SignupRequest $request)
     {
         try
         {
 
-            $validate = $request->validate([
-                'email' => ['required'],
-                'password' => ['required']
-            ]);
+            $validate = $request->validated();
              
             $user = User::where('Email',$validate['email'])->first();
 
@@ -75,7 +74,7 @@ class AccountActivator extends Controller
         }
         catch(ModelNotFoundException)
         {
-           return response()->json(["message" => "Applicant Not found"],404);
+           return response()->json(["message" => "Applicant not found"],404);
         }
          
 
@@ -84,7 +83,7 @@ class AccountActivator extends Controller
     {
         
         $validate = $request->validate([
-            "Email" =>['required']
+            "Email" =>['required','email']
         ]);
 
         try
@@ -115,7 +114,7 @@ class AccountActivator extends Controller
         try
         {
             $validate = $request->validate([
-                'email' => ['required']
+                'email' => ['required','email']
             ]);
             $user = User::where('Email', $validate['email'])->first();
             $user->tokens()->delete();
@@ -124,7 +123,8 @@ class AccountActivator extends Controller
             
             PasswordReset::dispatch($user,$token);
     
-            return response()->json(["message" => "You will recieve an email to reset your password"],200);
+            return response()->json(["message" => "If the email exists,
+                                     you will recieve instructions on how to reset your password "],200);
         }
         catch(ModelNotFoundException)
         {
@@ -138,7 +138,7 @@ class AccountActivator extends Controller
         {
             $validate = $request->validate([
                 'token' => ['required'],
-                'password' => ['required'],
+                'password' => ['required',Password::min(6)->numbers()],
         
             ]);
 

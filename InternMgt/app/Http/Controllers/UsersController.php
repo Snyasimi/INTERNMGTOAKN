@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Events\{AcceptedIntern,PasswordReset,AssignedSupervisor,CreatedSupervisor};
+use App\Http\Requests\AddUserRequest;
 use App\Models\{User,Role,Applicants,Position,Task};
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -41,7 +42,7 @@ class UsersController extends Controller
 	    {
             switch ($request->path()){
 
-                case 'api/Admin/User/Dashboard' :
+                case env('DASHBOARD') :
                     /**
                      * Results displayed are only the statistics 
                      */
@@ -55,7 +56,7 @@ class UsersController extends Controller
                     ];
                     return response()->json($data,200);
 
-                case 'api/Admin/User/Applicants' :
+                case env('ADM_APPLICANTS') :
 
                     /*
                     *Results displayed are only the applicants 
@@ -67,7 +68,7 @@ class UsersController extends Controller
 
                     return response()->json($data,200);
 
-                case 'api/Admin/User/Interviews' :
+                case env('ADM_INTERVIEWS') :
                     /*
                     *Interviews 
                     */
@@ -78,7 +79,7 @@ class UsersController extends Controller
     
                     return response()->json($data,200);
 
-                case 'api/Admin/User/Supervisors' :
+                case env('ADM_SUPERVISORS') :
                     /*
                     *Supervisors 
                     */
@@ -91,7 +92,7 @@ class UsersController extends Controller
 
                     break;
 
-		case 'api/Admin/User/Interns' :
+		case env('ADM_INTERNS') :
 			/**
 			 * When a request is made this route by an admin it returns all the interns 
 			 */
@@ -139,7 +140,7 @@ class UsersController extends Controller
 		    switch ($request->path()){
 
 		    
-		    case 'api/Supervisor/User/AssignedTasks' :
+		    case env('SUP_ASSIGNED_TASKS') :
 	
 			    $data = [
 		    
@@ -150,7 +151,7 @@ class UsersController extends Controller
 			    return response()->json($data,200);
 
     
-		    case 'api/Supervisor/User/MyInterns' :
+		    case env('SUP_INTERNS') :
 
 			    $data =[
 		    
@@ -194,9 +195,9 @@ class UsersController extends Controller
     public function create()
      {
         
-         $Supervisors = User::where('Role','SUP')->get();
-         $roles = Role::lazy();
-         $positions = Position::lazy();
+        //  $Supervisors = User::where('Role','SUP')->get();
+        //  $roles = Role::lazy();
+        //  $positions = Position::lazy();
 
     //    $data = [
             
@@ -207,7 +208,7 @@ class UsersController extends Controller
 
     //   //  return response()->json($data,200);
 
-     return view('User.create',['position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
+    //  return view('User.create',['position' => $positions,'roles'=>$roles,'Supervisors'=>$Supervisors]);
 
     }
 
@@ -217,7 +218,7 @@ class UsersController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AddUserRequest $request)
     {
         /**
          * This function takes the request input and cleans it 
@@ -225,14 +226,7 @@ class UsersController extends Controller
          * only a user with admin privilages can add users directly
          */
 
-        $validate = $request->validate([
-		
-            'Name' => ['required'],
-            'Email' => ['required'],
-	    'PhoneNumber' =>['required','size:13'],
-            'Position' => ['required'],
-            'Role' => ['required'],
-	]);
+        $validate = $request->validated();
 
 
         $user = new User;

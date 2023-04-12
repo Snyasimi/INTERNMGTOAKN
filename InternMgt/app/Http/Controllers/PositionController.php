@@ -18,8 +18,8 @@ class PositionController extends Controller
     public function index()
     {
         $data =[
+            'message' => 'Displaying positions',
             'Positions'=> Position::lazy(),
-            'message' => 'Displaying positions'
         ];
 
         return response()->json($data,200);

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 use App\Events\{InterviewDeclined,InterviewPassed,InterviewStatus};
-use App\Models\Position;
+use App\Http\Requests\ApplicationRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Applicants;
+use App\Models\{Applicants,Position};
 use Illuminate\Http\Request;
 
 
@@ -53,7 +53,7 @@ class ApplicantsController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function store(Request $request)
+    public function store(ApplicationRequest $request)
 	    /*
 	     * Save user to database 
 	     * 
@@ -61,27 +61,18 @@ class ApplicantsController extends Controller
     {
         try
         {
-            $validate = $request->validate([
-                'Name' => ['required'],
-                'Email' => ['required'],
-                'PhoneNumber' =>['required','size:13'],
-                'Position' => ['required'],
-                'Cv'=>['required','file'],
-                'AttachmentLetter' => ['required','file']
-    
-            ]);
+        
+             $validate = $request->validated();
     
              $url_to_cv = $request->file('Cv')->store('public');
              $url_to_attachment_letter = $request->file('AttachmentLetter')->store('public');
              
     
-           $applicant = Applicants::create([
+           Applicants::create([
                'Name' => $validate['Name'],
                'Email' => $validate['Email'],
                'PhoneNumber' => $validate['PhoneNumber'],
                'Position' => $validate['Position'],
-    
-               
                'url_to_cv_file' => $url_to_cv,	
                'url_to_attachment_letter' => $url_to_attachment_letter,
         
@@ -94,7 +85,7 @@ class ApplicantsController extends Controller
         }
         catch(QueryException)
         {
-            return response("Make sure the data you hvae entered is correct");
+            return response("Make sure the data you have entered is correct");
 
         }
 	     
@@ -180,11 +171,14 @@ class ApplicantsController extends Controller
                {
 
                 case 'Accepted':
+
                     $validate = $request->validate([
                         'Date' => ['required']
                     ]);
                     $Date = $validate['Date'];
+
                     InterviewStatus::dispatch($Applicant,$Date);
+
                     $data = [
                         'message' => 'Email Sent successfuly'
                     ];
@@ -259,7 +253,7 @@ class ApplicantsController extends Controller
 
         catch(ModelNotFoundException){
             $data = [
-                'message' => 'Not Found in database'
+                'message' => 'Not Found'
             ];
             return response()->json($data, 404);
         }
