@@ -16,12 +16,10 @@
                                                 <p>Dear {{$Name}},</p>
                                                 <p>
 
-													
-
-										Congratulations! You have been accepted for the {{$Position}} role at OAKNET BUSINESS.<br>
+										Congratulations on being shortlisted for this exciting opportunity. 
                                          We were impressed with your application and believe that your qualifications and experience meet our requirements.<br>
 
-                                        <br>We invite you to attend an interview with us on {{$Date}} at our office .
+                                        <br>We invite you to attend an interview with us on {{$Date}} at our office. If you have any questions or concerns,please do not hesitate to contact us.
                                                 </p>
                                                            
                                             </td>

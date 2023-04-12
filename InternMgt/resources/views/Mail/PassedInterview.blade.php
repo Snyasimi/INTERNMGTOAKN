@@ -14,11 +14,11 @@
             >
                 <tr>
                     <td>
-                        <p>Dear {{ $Name}},</p>
+                        <p>Dear {{$Name}},</p>
                         <p>
 
                 I am writing to inform you that you have been selected for the {{$Position}} role at Oaknet Business.<br> 
-                Your interview with our team was extremely impressive, and we are excited to offer you an internship position in our organization.<br>
+                Your interview with our team was extremely impressive, and we are excited to offer you an internship role in our organization.<br>
                 We believe that you have the skills and knowledge that will be a valuable addition to our team.<br>
                         </p>
                         <p>
