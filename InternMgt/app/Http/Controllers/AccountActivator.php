@@ -17,12 +17,12 @@ class AccountActivator extends Controller
     public function active()
     {
         //INSERT FRONT END URL HERE
-        return redirect()->away('http://192.168.137.1:3000/signUp');
+        return redirect()->away(env('FRONTEND_SIGNIN_URL'));
     }
     public function PasswordResetRedirect($id)
     {
         //INSERT FRONTEND URL HERE
-        return redirect()->away('http://192.168.1.146:3000/resetPassword/'.$id);
+        return redirect()->away(env('FRONTEND_PASSWDRESET_URL').$id);
     }
     public function Activate(SignupRequest $request)
     {
